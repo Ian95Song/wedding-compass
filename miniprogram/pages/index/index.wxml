@@ -1,0 +1,336 @@
+<view class="container">
+  <view wx:if="{{showPrivacyModal}}" class="privacy-modal">
+    <view class="privacy-overlay"></view>
+    <view class="privacy-content">
+      <view class="privacy-header">隐私政策与用户协议</view>
+      <view class="privacy-body">
+        <view class="privacy-intro">在使用备婚手账本之前，请仔细阅读并同意以下协议：</view>
+        <view class="privacy-item" bindtap="goToPrivacyPolicy" data-type="privacy">
+          <text class="privacy-link">《隐私政策》</text>
+          <text class="privacy-arrow">›</text>
+        </view>
+        <view class="privacy-item" bindtap="goToPrivacyPolicy" data-type="agreement">
+          <text class="privacy-link">《用户服务协议》</text>
+          <text class="privacy-arrow">›</text>
+        </view>
+        <view class="privacy-summary">
+          <view class="summary-title">核心要点：</view>
+          <view class="summary-item">• 您的数据仅存储在您的手机本地</view>
+          <view class="summary-item">• 我们不会收集、存储或传输您的个人信息</view>
+          <view class="summary-item">• 您的数据安全由您自己负责</view>
+        </view>
+      </view>
+      <view class="privacy-footer">
+        <button class="btn-refuse" bindtap="onRefusePrivacy">不同意</button>
+        <button class="btn-agree" bindtap="onAgreePrivacy">同意</button>
+      </view>
+    </view>
+  </view>
+  <view wx:if="{{!weddingDate}}" class="card welcome-card">
+    <view class="welcome-icon">💍</view>
+    <view class="welcome-title">欢迎来到备婚手账本</view>
+    <view class="welcome-desc">设置你的婚期，开启智能备婚之旅</view>
+    <picker mode="date" value="{{selectedDate}}" start="{{minDate}}" bindchange="onDateChange" class="date-picker">
+      <button class="btn-primary welcome-btn">设置婚期</button>
+    </picker>
+  </view>
+
+  <view wx:else>
+    <picker mode="date" value="{{selectedDate}}" start="{{minDate}}" bindchange="onDateChange" class="date-picker">
+      <view class="card countdown-card">
+        <view class="countdown-content">
+          <view class="countdown-number">{{daysLeft}}</view>
+          <view class="countdown-unit">天</view>
+        </view>
+        <view class="countdown-label">距离我们的婚礼</view>
+        <view class="countdown-date">{{weddingDateCN}}</view>
+        <view class="countdown-edit">点击修改</view>
+      </view>
+    </picker>
+
+    <view class="card progress-card">
+      <view class="progress-header">
+        <text class="progress-title">备婚进度</text>
+        <text class="progress-link" bindtap="goToGuide">查看详情</text>
+      </view>
+      <view class="progress-ring-container">
+        <view class="progress-ring">
+          <view class="progress-ring-inner">
+            <text class="progress-percent">{{progress}}%</text>
+          </view>
+        </view>
+        <view class="progress-ring-bg"></view>
+      </view>
+      <view class="progress-text">已完成 {{completedTasks}}/{{totalTasks}} 项任务</view>
+    </view>
+
+    <view class="card today-tasks-card">
+      <view class="task-header">
+        <text class="task-title">当前待办</text>
+        <text wx:if="{{todayTasks.length > 5}}" class="task-link" bindtap="goToGuide">查看全部</text>
+      </view>
+      <view wx:if="{{todayTasks.length === 0}}" class="empty-tasks">
+        <text class="empty-icon">🎉</text>
+        <text class="empty-text">今日任务已完成！</text>
+      </view>
+      <view wx:else>
+        <view
+          wx:for="{{todayTasks}}"
+          wx:key="id"
+          class="task-item {{item.removing ? 'removing' : ''}}"
+          bindtap="toggleTask"
+          data-id="{{item.id}}"
+        >
+          <view class="task-checkbox" data-id="{{item.id}}" bindtap="handleCheck">
+            <view class="checkbox-inner {{item.status === 'completed' || item.checking ? 'checked' : ''}}">
+              <text class="check-icon" wx:if="{{item.status === 'completed' || item.checking}}">✓</text>
+            </view>
+          </view>
+          <view class="task-content">
+            <text class="task-name {{item.status === 'completed' || item.checking ? 'completed' : ''}}">{{item.name}}</text>
+            <text class="task-desc">{{item.description}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="quick-actions">
+      <view class="action-title">快捷操作</view>
+      <view class="action-grid">
+        <view class="action-item" bindtap="openDecisionModal">
+          <view class="action-icon">📝</view>
+          <view class="action-name">记一笔决策</view>
+        </view>
+        <view class="action-item" bindtap="openGuestModal">
+          <view class="action-icon">👥</view>
+          <view class="action-name">添加宾客</view>
+        </view>
+        <view class="action-item" bindtap="openInspirationModal">
+          <view class="action-icon">💡</view>
+          <view class="action-name">添加灵感</view>
+        </view>
+        <view class="action-item" bindtap="openExpenseModal">
+          <view class="action-icon">💰</view>
+          <view class="action-name">记一笔支出</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showDecisionModal}}" bindtap="closeDecisionModal">
+    <view class="modal-container" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">记一笔决策</text>
+        <text class="modal-close" bindtap="closeDecisionModal">×</text>
+      </view>
+      <view class="modal-body">
+        <view class="form-item">
+          <text class="form-label">分类</text>
+          <view class="category-grid">
+            <view 
+              wx:for="{{decisionCategories}}" 
+              wx:key="id" 
+              class="category-tag {{decisionForm.category === item.id ? 'active' : ''}}"
+              bindtap="selectDecisionCategory"
+              data-id="{{item.id}}"
+            >
+              {{item.icon}} {{item.name}}
+            </view>
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">选项名称</text>
+          <input class="form-input" placeholder="请输入选项名称" value="{{decisionForm.name}}" data-field="name" bindinput="onDecisionInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">价格</text>
+          <input class="form-input" type="digit" placeholder="请输入价格" value="{{decisionForm.price}}" data-field="price" bindinput="onDecisionInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">日期</text>
+          <input class="form-input" type="date" placeholder="选择日期" value="{{decisionForm.date}}" data-field="date" bindinput="onDecisionInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">联系人</text>
+          <input class="form-input" placeholder="请输入联系人信息" value="{{decisionForm.contact}}" data-field="contact" bindinput="onDecisionInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">备注</text>
+          <textarea class="form-textarea" placeholder="请输入备注信息" value="{{decisionForm.notes}}" data-field="notes" bindinput="onDecisionInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">图片（可选）</text>
+          <view class="image-upload">
+            <view wx:for="{{tempDecisionImages}}" wx:key="index" class="image-item" bindtap="previewDecisionImage" data-src="{{item}}">
+              <image src="{{item}}" mode="aspectFill" class="uploaded-image" />
+              <view class="image-delete" bindtap="deleteTempDecisionImage" data-index="{{index}}">×</view>
+            </view>
+            <view wx:if="{{(tempDecisionImages.length + decisionForm.images.length) < 3}}" class="upload-btn" bindtap="chooseDecisionImage">
+              <text class="upload-icon">+</text>
+              <text class="upload-text">上传图片</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn-cancel" bindtap="closeDecisionModal">取消</button>
+        <button class="btn-confirm" bindtap="saveDecision">保存</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showGuestModal}}" bindtap="closeGuestModal">
+    <view class="modal-container" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">添加宾客</text>
+        <text class="modal-close" bindtap="closeGuestModal">×</text>
+      </view>
+      <view class="modal-body">
+        <view class="form-item">
+          <text class="form-label">姓名</text>
+          <input class="form-input" placeholder="请输入宾客姓名" value="{{guestForm.name}}" data-field="name" bindinput="onGuestInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">电话</text>
+          <input class="form-input" type="number" placeholder="请输入联系电话" value="{{guestForm.phone}}" data-field="phone" bindinput="onGuestInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">🤵 男方</text>
+          <view class="category-grid">
+            <view 
+              wx:for="{{groomRelations}}" 
+              wx:key="*this"
+              class="category-tag {{guestForm.relation === '男方-' + item ? 'active' : ''}}"
+              bindtap="selectGuestRelation"
+              data-relation="男方-{{item}}"
+            >
+              {{item}}
+            </view>
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">👰 女方</text>
+          <view class="category-grid">
+            <view 
+              wx:for="{{brideRelations}}" 
+              wx:key="*this"
+              class="category-tag {{guestForm.relation === '女方-' + item ? 'active' : ''}}"
+              bindtap="selectGuestRelation"
+              data-relation="女方-{{item}}"
+            >
+              {{item}}
+            </view>
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">备注</text>
+          <input class="form-input" placeholder="请输入备注（可选）" value="{{guestForm.note}}" data-field="note" bindinput="onGuestInput" />
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn-cancel" bindtap="closeGuestModal">取消</button>
+        <button class="btn-confirm" bindtap="saveGuest">保存</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showInspirationModal}}" bindtap="closeInspirationModal">
+    <view class="modal-container" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">添加灵感</text>
+        <text class="modal-close" bindtap="closeInspirationModal">×</text>
+      </view>
+      <view class="modal-body">
+        <view class="form-item">
+          <text class="form-label">类型</text>
+          <view class="category-grid">
+            <view 
+              wx:for="{{inspirationTypes}}" 
+              wx:key="id" 
+              class="category-tag {{inspirationForm.type === item.id ? 'active' : ''}}"
+              bindtap="selectInspirationType"
+              data-type="{{item.id}}"
+            >
+              {{item.icon}} {{item.name}}
+            </view>
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">内容</text>
+          <textarea wx:if="{{inspirationForm.type === 'text'}}" class="form-textarea" placeholder="请输入灵感内容" value="{{inspirationForm.content}}" data-field="content" bindinput="onInspirationInput" />
+          <input wx:elif="{{inspirationForm.type === 'link'}}" class="form-input" placeholder="请输入链接地址" value="{{inspirationForm.content}}" data-field="content" bindinput="onInspirationInput" />
+          <view wx:else class="upload-area" bindtap="uploadInspirationImage">
+            <text wx:if="{{!inspirationForm.content}}" class="upload-text">点击上传图片</text>
+            <image wx:else class="preview-image" src="{{inspirationForm.content}}" mode="aspectFill" />
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">标签</text>
+          <view class="tag-grid">
+            <view 
+              wx:for="{{inspirationTags}}" 
+              wx:key="*this" 
+              class="tag-item {{inspirationForm.tags.indexOf(item) > -1 ? 'active' : ''}}"
+              bindtap="toggleInspirationTag"
+              data-tag="{{item}}"
+            >
+              {{item}}
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn-cancel" bindtap="closeInspirationModal">取消</button>
+        <button class="btn-confirm" bindtap="saveInspiration">保存</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showExpenseModal}}" bindtap="closeExpenseModal">
+    <view class="modal-container" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">记一笔支出</text>
+        <text class="modal-close" bindtap="closeExpenseModal">×</text>
+      </view>
+      <view class="modal-body">
+        <view class="form-item">
+          <text class="form-label">类目</text>
+          <view class="category-grid">
+            <view 
+              wx:for="{{expenseCategories}}" 
+              wx:key="id" 
+              class="category-tag {{expenseForm.category === item.id ? 'active' : ''}}"
+              bindtap="selectExpenseCategory"
+              data-id="{{item.id}}"
+            >
+              {{item.icon}} {{item.name}}
+            </view>
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">描述</text>
+          <input class="form-input" placeholder="如：婚宴酒席 20桌" value="{{expenseForm.description}}" data-field="description" bindinput="onExpenseInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">金额</text>
+          <input class="form-input" type="digit" placeholder="请输入金额" value="{{expenseForm.amount}}" data-field="amount" bindinput="onExpenseInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">是否已支付</text>
+          <view class="form-switch-wrapper">
+            <text class="form-switch-label">{{expenseForm.isPaid ? '已支付' : '待支付'}}</text>
+            <switch checked="{{expenseForm.isPaid}}" bindchange="onExpensePaidChange" color="#D4A574" />
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">备注</text>
+          <input class="form-input" placeholder="请输入备注信息" value="{{expenseForm.note}}" data-field="note" bindinput="onExpenseInput" />
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn-cancel" bindtap="closeExpenseModal">取消</button>
+        <button class="btn-confirm" bindtap="saveExpense">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

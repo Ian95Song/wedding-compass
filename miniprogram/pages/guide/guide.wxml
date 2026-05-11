@@ -1,0 +1,161 @@
+<view wx:if="{{!weddingDate}}" class="date-setup">
+  <view class="setup-bg">
+    <view class="setup-icon">💍</view>
+    <view class="setup-title">设置你的婚期</view>
+    <view class="setup-desc">选择婚礼日期后，我们将为你生成专属备婚时间线</view>
+    <picker mode="date" value="{{defaultDate}}" bindchange="onDateChange">
+      <view class="date-picker">
+        <text class="date-icon">📅</text>
+        <text class="date-text">{{selectedDate || '请选择婚期'}}</text>
+        <text class="date-arrow">›</text>
+      </view>
+    </picker>
+    <button wx:if="{{selectedDate}}" class="btn-primary setup-btn" bindtap="confirmDate">确认婚期</button>
+  </view>
+</view>
+
+<view wx:else class="guide-container">
+  <view class="current-phase">
+    <view class="phase-badge" style="background: {{currentPhase.color}}">
+      <text class="phase-text">{{currentPhase.name}}</text>
+    </view>
+    <view class="days-left">距离婚礼还有 {{daysLeft}} 天</view>
+  </view>
+
+  <view class="timeline">
+    <view 
+      wx:for="{{phases}}" 
+      wx:key="phase" 
+      class="phase-item"
+      data-phase="{{item.phase}}"
+    >
+      <view class="phase-header" bindtap="togglePhase" data-phase="{{item.phase}}">
+        <view class="phase-info">
+          <view class="phase-indicator" style="background: {{item.color}}"></view>
+          <view class="phase-content">
+            <view class="phase-name">{{item.phaseName}}</view>
+            <view class="phase-task-count">{{item.isTimeline ? item.timeline.length + '个环节' : item.completed + '/' + item.total + ' 项任务'}}</view>
+          </view>
+        </view>
+        <view class="phase-arrow {{expandedPhase === item.phase ? 'expanded' : ''}}">›</view>
+      </view>
+      
+      <view wx:if="{{expandedPhase === item.phase && !item.isTimeline}}" class="phase-tasks">
+        <view 
+          wx:for="{{item.tasks}}" 
+          wx:key="id" 
+          class="task-item"
+          bindtap="toggleTask"
+          data-id="{{item.id}}"
+        >
+          <view class="task-checkbox {{item.status === 'completed' ? 'checked' : ''}}">
+            <text wx:if="{{item.status === 'completed'}}">✓</text>
+          </view>
+          <view class="task-content">
+            <text class="task-name {{item.status === 'completed' ? 'completed' : ''}}">{{item.name}}</text>
+            <text class="task-desc">{{item.description}}</text>
+          </view>
+          <view class="task-actions">
+            <text class="action-btn move" catchtap="moveTask" data-id="{{item.id}}">移动</text>
+          </view>
+        </view>
+      </view>
+
+      <view wx:if="{{expandedPhase === item.phase && item.isTimeline}}" class="phase-timeline">
+        <view 
+          wx:for="{{item.timeline}}" 
+          wx:key="time"
+          class="timeline-item"
+        >
+          <view class="timeline-time">{{item.time}}</view>
+          <view class="timeline-title">{{item.title}}</view>
+          <view 
+            wx:for="{{item.sections}}" 
+            wx:for-item="section"
+            wx:key="name"
+            class="timeline-section"
+          >
+            <view class="section-name">{{section.name}}</view>
+            <view 
+              wx:for="{{section.items}}" 
+              wx:for-item="timelineItem"
+              wx:key="*this"
+              class="timeline-content-item"
+            >
+              {{timelineItem}}
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="add-task-area">
+    <button class="add-task-btn" bindtap="addCustomTask">+ 添加自定义任务</button>
+  </view>
+</view>
+
+<view wx:if="{{showAddTaskModal}}" class="modal-overlay" bindtap="closeAddTaskModal">
+  <view class="modal-content add-task-modal" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">添加任务</text>
+      <text class="modal-close" bindtap="closeAddTaskModal">×</text>
+    </view>
+    <view class="modal-body">
+      <view class="form-label">任务名称</view>
+      <input class="task-input" placeholder="请输入任务名称" value="{{newTaskName}}" bindinput="onTaskNameInput" />
+      <view class="form-label mt-20">任务描述</view>
+      <textarea class="task-desc-input" placeholder="请输入任务描述（可选）" value="{{newTaskDesc}}" bindinput="onTaskDescInput" />
+      <view class="form-label mt-20">添加到阶段</view>
+      <picker mode="selector" range="{{phaseOptions}}" range-key="name" value="{{selectedPhaseIndex}}" bindchange="onPhaseSelectForAdd">
+        <view class="phase-picker">
+          <text class="phase-picker-text">{{selectedPhaseName}}</text>
+          <text class="phase-picker-arrow">›</text>
+        </view>
+      </picker>
+    </view>
+    <view class="modal-footer">
+      <button class="btn-secondary" bindtap="closeAddTaskModal">取消</button>
+      <button class="btn-primary" bindtap="saveTask">保存</button>
+    </view>
+  </view>
+</view>
+
+<view wx:if="{{showMoveTaskModal}}" class="modal-overlay" bindtap="closeMoveTaskModal">
+  <view class="modal-content move-modal" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">移动任务</text>
+      <text class="modal-close" bindtap="closeMoveTaskModal">×</text>
+    </view>
+    <view class="modal-body">
+      <view class="move-task-info">
+        <text class="move-task-name">{{taskToMove.name}}</text>
+        <view class="move-task-current">
+          <text class="current-label">当前阶段：</text>
+          <text class="current-phase-name" style="color: {{currentPhaseColor}}">{{currentPhaseName}}</text>
+        </view>
+      </view>
+      <view class="phase-grid">
+        <view 
+          wx:for="{{phases}}" 
+          wx:key="phase"
+          class="phase-card {{item.phase === targetPhase ? 'selected' : ''}} {{item.phase === taskSourcePhase ? 'source-phase' : ''}}"
+          style="border-color: {{item.color}}"
+          bindtap="onPhaseSelect"
+          data-phase="{{item.phase}}"
+          wx:if="{{!item.isTimeline}}"
+        >
+          <view class="phase-indicator" style="background: {{item.color}}"></view>
+          <text class="phase-card-name">{{item.phaseName}}</text>
+          <text class="phase-card-count">{{item.total}}项</text>
+          <text class="phase-card-badge" wx:if="{{item.phase === taskSourcePhase}}">当前</text>
+        </view>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn-secondary" bindtap="closeMoveTaskModal">取消</button>
+      <button class="btn-primary {{targetPhase === taskSourcePhase ? 'disabled' : ''}}" bindtap="confirmMoveTask" wx:if="{{targetPhase !== taskSourcePhase}}">确认移动</button>
+      <button class="btn-primary disabled" wx:else>确认移动</button>
+    </view>
+  </view>
+</view>

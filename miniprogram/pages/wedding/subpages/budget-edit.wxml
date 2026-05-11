@@ -1,0 +1,36 @@
+<view class="edit-container">
+  <view class="form-section">
+    <view class="form-label">预算分类</view>
+    <picker mode="selector" bindchange="onCategoryChange" value="{{categoriesIndex}}" range="{{categories}}" range-key="name">
+      <view class="form-picker">
+        <text class="picker-text">{{selectedCategoryName}}</text>
+        <text class="picker-arrow">›</text>
+      </view>
+    </picker>
+  </view>
+
+  <view class="form-section">
+    <view class="form-label">预算描述</view>
+    <input class="form-input" placeholder="婚宴酒席 20桌" value="{{formData.description}}" bindinput="onDescriptionInput" />
+  </view>
+
+  <view class="form-section">
+    <view class="form-label">预算金额（元）</view>
+    <view class="amount-input-wrapper">
+      <text class="input-prefix">¥</text>
+      <input class="amount-input" type="digit" placeholder="0.00" value="{{formData.amount}}" bindinput="onAmountInput" />
+    </view>
+  </view>
+
+  <view class="form-section">
+    <view class="form-label">是否已支付</view>
+    <view class="form-switch-wrapper">
+      <text class="form-switch-label">已支付</text>
+      <switch checked="{{formData.isPaid}}" bindchange="onPaidChange" color="#D4A574" />
+    </view>
+  </view>
+
+  <view class="form-actions">
+    <button class="btn-primary" bindtap="save">保存</button>
+  </view>
+</view>

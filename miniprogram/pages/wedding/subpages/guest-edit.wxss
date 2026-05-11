@@ -1,0 +1,71 @@
+.edit-container {
+  padding: 32rpx;
+  padding-bottom: 120rpx;
+}
+
+.form-section {
+  margin-bottom: 36rpx;
+}
+
+.form-label {
+  font-size: 30rpx;
+  color: #333333;
+  font-weight: 500;
+  margin-bottom: 16rpx;
+}
+
+.form-input {
+  background: #FFFFFF;
+  border: 2rpx solid #F0F0F0;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+  font-size: 32rpx;
+  color: #333333;
+  line-height: 100rpx;
+  height: 100rpx;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  border-color: #D4A574;
+  outline: none;
+}
+
+.form-input::placeholder {
+  color: #CCCCCC;
+  font-size: 30rpx;
+  line-height: 100rpx;
+}
+
+.form-textarea {
+  background: #FFFFFF;
+  border: 2rpx solid #F0F0F0;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  font-size: 30rpx;
+  color: #333333;
+  min-height: 160rpx;
+  width: 100%;
+  box-sizing: border-box;
+  line-height: 1.6;
+}
+
+.form-textarea::placeholder {
+  color: #CCCCCC;
+  font-size: 28rpx;
+}
+
+.form-actions {
+  margin-top: 60rpx;
+}
+
+.form-actions .btn-primary {
+  width: 100%;
+  padding: 28rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  border-radius: 48rpx;
+  background: linear-gradient(135deg, #D4A574 0%, #C4956A 100%);
+  color: #FFFFFF;
+  border: none;
+}

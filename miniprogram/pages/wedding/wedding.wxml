@@ -1,0 +1,250 @@
+<view class="wedding-container">
+  <view class="section-title">我的婚礼</view>
+  
+  <view class="card-grid">
+    <view class="card-item" bindtap="goToDecision">
+      <view class="card-icon">📝</view>
+      <view class="card-name">决策本</view>
+      <view class="card-count">{{decisionCount}} 条记录</view>
+    </view>
+    
+    <view class="card-item" bindtap="goToBudget">
+      <view class="card-icon">💰</view>
+      <view class="card-name">预算管理</view>
+      <view class="card-count">¥{{formattedBudget}}</view>
+    </view>
+    
+    <view class="card-item" bindtap="goToGuests">
+      <view class="card-icon">👥</view>
+      <view class="card-name">宾客名单</view>
+      <view class="card-count">{{guestCount}} 位宾客</view>
+    </view>
+    
+    <view class="card-item" bindtap="goToSeating">
+      <view class="card-icon">🪑</view>
+      <view class="card-name">座位安排</view>
+      <view class="card-count">{{tableCount}} 桌</view>
+    </view>
+    
+    <view class="card-item" bindtap="goToGifts">
+      <view class="card-icon">🎁</view>
+      <view class="card-name">礼金记录</view>
+      <view class="card-count">¥{{formattedGifts}}</view>
+    </view>
+    
+    <view class="card-item" bindtap="goToChecklist">
+      <view class="card-icon">✅</view>
+      <view class="card-name">婚品清单</view>
+      <view class="card-count">{{checkedItems}}/{{totalItems}} 已购</view>
+    </view>
+  </view>
+
+  <view class="section-title">快捷入口</view>
+  
+  <view class="quick-card">
+    <view class="quick-item" bindtap="openDecisionModal">
+      <text class="quick-icon">➕</text>
+      <text class="quick-text">记一笔决策</text>
+    </view>
+    <view class="quick-item" bindtap="openGuestModal">
+      <text class="quick-icon">➕</text>
+      <text class="quick-text">添加宾客</text>
+    </view>
+    <view class="quick-item" bindtap="openBudgetModal">
+      <text class="quick-icon">➕</text>
+      <text class="quick-text">记录支出</text>
+    </view>
+    <view class="quick-item" bindtap="openGiftModal">
+      <text class="quick-icon">➕</text>
+      <text class="quick-text">登记礼金</text>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showGiftModal}}" bindtap="closeGiftModal">
+    <view class="modal-container" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">登记礼金</text>
+        <text class="modal-close" bindtap="closeGiftModal">×</text>
+      </view>
+      <view class="modal-body">
+        <view class="form-item">
+          <text class="form-label">姓名</text>
+          <input class="form-input" placeholder="请输入姓名" value="{{giftForm.name}}" data-field="name" bindinput="onGiftInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">金额</text>
+          <input class="form-input" placeholder="请输入金额" type="digit" value="{{giftForm.amount}}" data-field="amount" bindinput="onGiftInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">关系</text>
+          <view class="form-options">
+            <view wx:for="{{giftRelations}}" wx:key="*this" class="option-item {{giftForm.relation === item ? 'selected' : ''}}" bindtap="selectGiftRelation" data-value="{{item}}">
+              {{item}}
+            </view>
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">备注</text>
+          <input class="form-input" placeholder="请输入备注（可选）" value="{{giftForm.note}}" data-field="note" bindinput="onGiftInput" />
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn-secondary" bindtap="closeGiftModal">取消</button>
+        <button class="btn-primary" bindtap="saveGift">保存</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showDecisionModal}}" bindtap="closeDecisionModal">
+    <view class="modal-container" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">记一笔决策</text>
+        <text class="modal-close" bindtap="closeDecisionModal">×</text>
+      </view>
+      <view class="modal-body">
+        <view class="form-item">
+          <text class="form-label">分类</text>
+          <view class="form-options">
+            <view wx:for="{{decisionCategories}}" wx:key="id" class="option-item {{decisionForm.category === item.id ? 'selected' : ''}}" bindtap="selectDecisionCategory" data-id="{{item.id}}">
+              {{item.name}}
+            </view>
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">名称</text>
+          <input class="form-input" placeholder="请输入选项名称" value="{{decisionForm.name}}" data-field="name" bindinput="onDecisionInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">价格</text>
+          <input class="form-input" placeholder="请输入价格" type="digit" value="{{decisionForm.price}}" data-field="price" bindinput="onDecisionInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">日期</text>
+          <input class="form-input" placeholder="选择日期" type="date" value="{{decisionForm.date}}" data-field="date" bindinput="onDecisionInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">联系方式</text>
+          <input class="form-input" placeholder="请输入联系方式" value="{{decisionForm.contact}}" data-field="contact" bindinput="onDecisionInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">备注</text>
+          <textarea class="form-textarea" placeholder="请输入备注（可选）" value="{{decisionForm.notes}}" data-field="notes" bindinput="onDecisionInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">图片（可选）</text>
+          <view class="image-upload">
+            <view wx:for="{{tempDecisionImages}}" wx:key="index" class="image-item" bindtap="previewDecisionImage" data-src="{{item}}">
+              <image src="{{item}}" mode="aspectFill" class="uploaded-image" />
+              <view class="image-delete" bindtap="deleteTempDecisionImage" data-index="{{index}}">×</view>
+            </view>
+            <view wx:if="{{(tempDecisionImages.length + decisionForm.images.length) < 3}}" class="upload-btn" bindtap="chooseDecisionImage">
+              <text class="upload-icon">+</text>
+              <text class="upload-text">上传图片</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn-secondary" bindtap="closeDecisionModal">取消</button>
+        <button class="btn-primary" bindtap="saveDecision">保存</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showGuestModal}}" bindtap="closeGuestModal">
+    <view class="modal-container" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">添加宾客</text>
+        <text class="modal-close" bindtap="closeGuestModal">×</text>
+      </view>
+      <view class="modal-body">
+        <view class="form-item">
+          <text class="form-label">姓名</text>
+          <input class="form-input" placeholder="请输入姓名" value="{{guestForm.name}}" data-field="name" bindinput="onGuestInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">电话</text>
+          <input class="form-input" placeholder="请输入电话" type="digit" value="{{guestForm.phone}}" data-field="phone" bindinput="onGuestInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">🤵 男方</text>
+          <view class="form-options">
+            <view 
+              wx:for="{{groomRelations}}" 
+              wx:key="*this"
+              class="option-item {{guestForm.relation === '男方-' + item ? 'selected' : ''}}"
+              bindtap="selectGuestRelation"
+              data-relation="男方-{{item}}"
+            >
+              {{item}}
+            </view>
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">👰 女方</text>
+          <view class="form-options">
+            <view 
+              wx:for="{{brideRelations}}" 
+              wx:key="*this"
+              class="option-item {{guestForm.relation === '女方-' + item ? 'selected' : ''}}"
+              bindtap="selectGuestRelation"
+              data-relation="女方-{{item}}"
+            >
+              {{item}}
+            </view>
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">备注</text>
+          <input class="form-input" placeholder="请输入备注（可选）" value="{{guestForm.note}}" data-field="note" bindinput="onGuestInput" />
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn-secondary" bindtap="closeGuestModal">取消</button>
+        <button class="btn-primary" bindtap="saveGuest">保存</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showBudgetModal}}" bindtap="closeBudgetModal">
+    <view class="modal-container" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">记录支出</text>
+        <text class="modal-close" bindtap="closeBudgetModal">×</text>
+      </view>
+      <view class="modal-body">
+        <view class="form-item">
+          <text class="form-label">类目</text>
+          <view class="form-options">
+            <view wx:for="{{budgetCategories}}" wx:key="id" class="option-item {{budgetForm.category === item.id ? 'selected' : ''}}" bindtap="selectBudgetCategory" data-id="{{item.id}}">
+              {{item.name}}
+            </view>
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">描述</text>
+          <input class="form-input" placeholder="如：婚宴酒席 20桌" value="{{budgetForm.description}}" data-field="description" bindinput="onBudgetInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">金额</text>
+          <input class="form-input" placeholder="请输入金额" type="digit" value="{{budgetForm.amount}}" data-field="amount" bindinput="onBudgetInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">是否已支付</text>
+          <view class="form-switch-wrapper">
+            <text class="form-switch-label">{{budgetForm.isPaid ? '已支付' : '待支付'}}</text>
+            <switch checked="{{budgetForm.isPaid}}" bindchange="onBudgetPaidChange" color="#D4A574" />
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">备注</text>
+          <input class="form-input" placeholder="请输入备注（可选）" value="{{budgetForm.note}}" data-field="note" bindinput="onBudgetInput" />
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn-secondary" bindtap="closeBudgetModal">取消</button>
+        <button class="btn-primary" bindtap="saveBudget">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

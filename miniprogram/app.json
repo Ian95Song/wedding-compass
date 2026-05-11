@@ -1,0 +1,67 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/guide/guide",
+    "pages/wedding/wedding",
+    "pages/wedding/subpages/decision",
+    "pages/wedding/subpages/decision-edit",
+    "pages/wedding/subpages/budget",
+    "pages/wedding/subpages/budget-edit",
+    "pages/wedding/subpages/guests",
+    "pages/wedding/subpages/guest-edit",
+    "pages/wedding/subpages/seating",
+    "pages/wedding/subpages/gifts",
+    "pages/wedding/subpages/checklist",
+    "pages/inspiration/inspiration",
+    "pages/inspiration/case-detail",
+    "pages/profile/profile",
+    "pages/profile/privacy"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FDF8F3",
+    "navigationBarTitleText": "备婚手帐本",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FDF8F3"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#D4A574",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "assets/icons/home.png",
+        "selectedIconPath": "assets/icons/home-active.png"
+      },
+      {
+        "pagePath": "pages/guide/guide",
+        "text": "备婚指南",
+        "iconPath": "assets/icons/guide.png",
+        "selectedIconPath": "assets/icons/guide-active.png"
+      },
+      {
+        "pagePath": "pages/wedding/wedding",
+        "text": "我的婚礼",
+        "iconPath": "assets/icons/wedding.png",
+        "selectedIconPath": "assets/icons/wedding-active.png"
+      },
+      {
+        "pagePath": "pages/inspiration/inspiration",
+        "text": "灵感库",
+        "iconPath": "assets/icons/light.png",
+        "selectedIconPath": "assets/icons/light-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "assets/icons/profile.png",
+        "selectedIconPath": "assets/icons/profile-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

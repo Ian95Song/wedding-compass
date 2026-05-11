@@ -1,0 +1,124 @@
+<view wx:if="{{caseDetail}}" class="case-detail-container">
+  <view class="case-cover">
+    <image src="{{caseDetail.coverImage}}" mode="aspectFill" class="cover-image" />
+    <view class="cover-overlay">
+      <text class="case-title">{{caseDetail.title}}</text>
+      <view class="case-tags">
+        <text class="tag">{{caseDetail.city}}</text>
+        <text class="tag">{{caseDetail.venueType}}</text>
+        <text class="tag">{{caseDetail.budget}}</text>
+        <text class="tag">{{caseDetail.style}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="case-content">
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">婚礼信息</text>
+      </view>
+      <view class="info-grid">
+        <view class="info-item">
+          <text class="info-icon">📅</text>
+          <text class="info-label">婚礼日期</text>
+          <text class="info-value">{{caseDetail.weddingDate}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-icon">👥</text>
+          <text class="info-label">宾客人数</text>
+          <text class="info-value">{{caseDetail.guestCount}}人</text>
+        </view>
+        <view class="info-item">
+          <text class="info-icon">📍</text>
+          <text class="info-label">婚礼场地</text>
+          <text class="info-value">{{caseDetail.venue}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-icon">🌸</text>
+          <text class="info-label">举办季节</text>
+          <text class="info-value">{{caseDetail.season}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">婚礼故事</text>
+      </view>
+      <text class="section-text">{{caseDetail.story}}</text>
+    </view>
+
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">婚礼亮点</text>
+      </view>
+      <view class="highlights-list">
+        <view wx:for="{{caseDetail.highlights}}" wx:key="*this" class="highlight-item">
+          <text class="highlight-icon">✨</text>
+          <text class="highlight-text">{{item}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section expense-section">
+      <view class="section-header">
+        <text class="section-title">费用明细</text>
+        <text class="total-cost">¥{{caseDetail.totalCost}}</text>
+      </view>
+      <view class="expense-list">
+        <view class="expense-item">
+          <text class="expense-label">场地费</text>
+          <text class="expense-value">¥{{caseDetail.costBreakdown.venue}}</text>
+        </view>
+        <view class="expense-item">
+          <text class="expense-label">餐饮费</text>
+          <text class="expense-value">¥{{caseDetail.costBreakdown.catering}}</text>
+        </view>
+        <view class="expense-item">
+          <text class="expense-label">婚庆布置</text>
+          <text class="expense-value">¥{{caseDetail.costBreakdown.decoration}}</text>
+        </view>
+        <view class="expense-item">
+          <text class="expense-label">婚纱摄影</text>
+          <text class="expense-value">¥{{caseDetail.costBreakdown.photography}}</text>
+        </view>
+        <view class="expense-item">
+          <text class="expense-label">婚纱礼服</text>
+          <text class="expense-value">¥{{caseDetail.costBreakdown.dress}}</text>
+        </view>
+        <view class="expense-item">
+          <text class="expense-label">化妆造型</text>
+          <text class="expense-value">¥{{caseDetail.costBreakdown.makeup}}</text>
+        </view>
+        <view class="expense-item">
+          <text class="expense-label">婚礼主持</text>
+          <text class="expense-value">¥{{caseDetail.costBreakdown.host}}</text>
+        </view>
+        <view class="expense-item">
+          <text class="expense-label">婚车租赁</text>
+          <text class="expense-value">¥{{caseDetail.costBreakdown.weddingCar}}</text>
+        </view>
+        <view class="expense-item">
+          <text class="expense-label">喜糖礼品</text>
+          <text class="expense-value">¥{{caseDetail.costBreakdown.gift}}</text>
+        </view>
+        <view class="expense-item">
+          <text class="expense-label">其他费用</text>
+          <text class="expense-value">¥{{caseDetail.costBreakdown.other}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">经验小贴士</text>
+      </view>
+      <view class="tips-list">
+        <view wx:for="{{caseDetail.tips}}" wx:key="*this" class="tip-item">
+          <text class="tip-icon">💡</text>
+          <text class="tip-text">{{item}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

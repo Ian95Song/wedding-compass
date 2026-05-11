@@ -1,0 +1,88 @@
+<view class="checklist-container">
+  <view class="category-picker">
+    <picker mode="selector" range="{{categories}}" value="{{activeCategoryIndex}}" bindchange="switchCategory">
+      <view class="picker-content">
+        <text class="picker-text">{{activeCategory}}</text>
+        <text class="picker-arrow">▼</text>
+      </view>
+    </picker>
+  </view>
+
+  <view class="progress-section">
+    <view class="progress-header">
+      <text class="progress-text">已完成: {{checkedCount}}/{{totalItems}}</text>
+      <text class="progress-percent">{{progressPercent}}%</text>
+    </view>
+    <view class="progress-bar">
+      <view class="progress-fill" style="width: {{progressPercent}}%"></view>
+    </view>
+  </view>
+
+  <view wx:if="{{currentChecklist.length === 0}}" class="empty-state">
+    <text class="empty-icon">📋</text>
+    <text class="empty-text">该分类暂无物品</text>
+  </view>
+
+  <view wx:else class="items-list">
+    <view 
+      wx:for="{{currentChecklist}}" 
+      wx:key="id" 
+      class="item-card"
+    >
+      <view 
+        class="item-checkbox {{item.isChecked ? 'checked' : ''}}"
+        bindtap="toggleChecked"
+        data-index="{{index}}"
+      >
+        <text wx:if="{{item.isChecked}}" class="check-icon">✓</text>
+      </view>
+      <view class="item-info">
+        <text class="item-name {{item.isChecked ? 'checked' : ''}}">{{item.name}}</text>
+        <text wx:if="{{item.note}}" class="item-note">{{item.note}}</text>
+      </view>
+      <view class="item-actions">
+        <text class="action-btn edit" bindtap="openEditModal" data-index="{{index}}">编辑</text>
+        <text class="action-btn delete" bindtap="deleteItem" data-index="{{index}}">删除</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-bar">
+    <button class="add-btn" bindtap="openAddModal">+ 添加物品</button>
+  </view>
+
+  <view wx:if="{{showModal}}" class="modal-overlay" bindtap="closeModal">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">{{isEdit ? '编辑物品' : '添加物品'}}</text>
+        <text class="modal-close" bindtap="closeModal">×</text>
+      </view>
+      <view class="modal-body">
+        <view class="form-item">
+          <text class="form-label">物品名称 *</text>
+          <input 
+            class="form-input" 
+            placeholder="请输入物品名称" 
+            value="{{form.name}}" 
+            data-field="name" 
+            bindinput="onInput" 
+          />
+        </view>
+        <view class="form-item">
+          <text class="form-label">备注</text>
+          <textarea 
+            class="form-textarea" 
+            placeholder="请输入备注（可选）" 
+            value="{{form.note}}" 
+            data-field="note" 
+            bindinput="onInput" 
+          />
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn-cancel" bindtap="closeModal">取消</button>
+        <button class="btn-save" bindtap="saveItem">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

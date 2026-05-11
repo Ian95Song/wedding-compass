@@ -1,0 +1,201 @@
+<view class="seating-container">
+  <view class="summary-card">
+    <view class="summary-item">
+      <text class="summary-value">{{tables.length}}</text>
+      <text class="summary-label">总桌数</text>
+    </view>
+    <view class="summary-divider"></view>
+    <view class="summary-item">
+      <text class="summary-value">{{totalGuests}}</text>
+      <text class="summary-label">宾客总数</text>
+    </view>
+    <view class="summary-divider"></view>
+    <view class="summary-item">
+      <text class="summary-value text-success">{{assignedCount}}</text>
+      <text class="summary-label">已安排</text>
+    </view>
+  </view>
+
+  <view class="action-bar">
+    <button class="add-btn" bindtap="addTable">
+      <text class="btn-icon">+</text>
+      <text class="btn-text">添加桌号</text>
+    </button>
+    <button class="export-btn" bindtap="exportSeating">
+      <text class="btn-icon">📊</text>
+      <text class="btn-text">导出Excel</text>
+    </button>
+  </view>
+
+  <view class="tables-grid">
+    <view 
+      wx:for="{{tables}}" 
+      wx:key="id" 
+      class="table-card"
+      bindtap="showTableDetail"
+      data-id="{{item.id}}"
+    >
+      <view class="table-header">
+        <text class="table-number">桌 {{item.number}}</text>
+        <text wx:if="{{item.name}}" class="table-name">{{item.name}}</text>
+      </view>
+      <view class="table-info">
+        <view class="info-row">
+          <text class="info-label">人数上限</text>
+          <text class="info-value">{{item.maxGuests}}人</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">已安排</text>
+          <text class="info-value {{item.guests.length >= item.maxGuests ? 'full' : ''}}">{{item.guests.length}}人</text>
+        </view>
+      </view>
+      <view class="table-progress">
+        <view class="progress-bar">
+          <view class="progress-fill {{item.guests.length >= item.maxGuests ? 'full' : ''}}" style="width: {{getTableProgress(item)}}%"></view>
+        </view>
+      </view>
+
+      <view class="table-actions" catchtap="stopPropagation">
+        <view class="action-btn primary" catchtap="assignGuests" data-id="{{item.id}}">
+          <text>安排宾客</text>
+        </view>
+        <view class="action-btn secondary" catchtap="editTable" data-id="{{item.id}}">编辑</view>
+        <view class="action-btn danger" catchtap="deleteTable" data-id="{{item.id}}">删除</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{tables.length === 0}}" class="empty-page">
+    <text class="empty-icon">🪑</text>
+    <text class="empty-title">暂无座位安排</text>
+    <text class="empty-desc">点击上方"添加桌号"开始安排</text>
+  </view>
+</view>
+
+<view wx:if="{{showAddTableModal}}" class="modal-overlay" bindtap="closeModal">
+  <view class="modal-content modal-lg" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">{{editingTable ? '编辑桌号' : '添加桌号'}}</text>
+      <text class="modal-close" bindtap="closeModal">×</text>
+    </view>
+    <view class="modal-body">
+      <view class="form-item">
+        <text class="form-label">桌号</text>
+        <input class="form-input" type="number" placeholder="请输入桌号（如：1）" value="{{formData.tableNumber}}" bindinput="onInput" data-field="tableNumber" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">桌名（可选）</text>
+        <input class="form-input" placeholder="如：主桌、贵宾桌" value="{{formData.tableName}}" bindinput="onInput" data-field="tableName" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">人数上限</text>
+        <input class="form-input" type="number" placeholder="该桌可容纳人数" value="{{formData.maxGuests}}" bindinput="onInput" data-field="maxGuests" />
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn-secondary" bindtap="closeModal">取消</button>
+      <button class="btn-primary" bindtap="saveTable">保存</button>
+    </view>
+  </view>
+</view>
+
+<view wx:if="{{showAssignModal}}" class="modal-overlay" bindtap="closeAssignModal">
+  <view class="modal-content modal-lg" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">安排宾客</text>
+      <text class="modal-subtitle">桌 {{selectedTable ? selectedTable.number : ''}}</text>
+      <text class="modal-close" bindtap="closeAssignModal">×</text>
+    </view>
+    <view class="modal-body assign-modal">
+      <view class="assigned-section">
+        <view class="section-header">
+          <text class="section-title">已安排</text>
+          <text class="section-count {{selectedTable && selectedTable.guests && selectedTable.guests.length >= selectedTable.maxGuests ? 'full' : ''}}">
+            {{selectedTable && selectedTable.guests ? selectedTable.guests.length : 0}}/{{selectedTable ? selectedTable.maxGuests : 0}}
+          </text>
+        </view>
+        <scroll-view scroll-y class="assigned-list">
+          <view wx:if="{{selectedTable && selectedTable.guests && selectedTable.guests.length > 0}}">
+            <view wx:for="{{selectedTable.guests}}" wx:key="id" class="assigned-item">
+              <view class="guest-info">
+                <text class="guest-icon">{{item.name.charAt(0)}}</text>
+                <text class="guest-name">{{item.name}}</text>
+              </view>
+              <text class="remove-btn" catchtap="removeGuest" data-table-id="{{selectedTable.id}}" data-guest-id="{{item.id}}">移除</text>
+            </view>
+          </view>
+          <view wx:else class="empty-state">
+            <text>暂无宾客，点击下方添加</text>
+          </view>
+        </scroll-view>
+      </view>
+      <view class="available-section">
+        <view class="section-header">
+          <text class="section-title">可选宾客</text>
+          <text class="section-count">{{availableGuests.length}}人</text>
+        </view>
+        <scroll-view scroll-y class="available-list">
+          <view wx:if="{{availableGuests.length > 0}}">
+            <view wx:for="{{availableGuests}}" wx:key="id" class="available-item" catchtap="assignGuestToTable" data-id="{{item.id}}" data-name="{{item.name}}">
+              <view class="guest-info">
+                <text class="guest-icon">{{item.name.charAt(0)}}</text>
+                <view class="guest-detail">
+                  <text class="guest-name">{{item.name}}</text>
+                  <text class="guest-phone">{{item.phone}}</text>
+                </view>
+              </view>
+              <text class="add-btn-icon">+</text>
+            </view>
+          </view>
+          <view wx:else class="empty-state">
+            <text>暂无可用宾客</text>
+          </view>
+        </scroll-view>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn-primary" bindtap="closeAssignModal">完成</button>
+    </view>
+  </view>
+</view>
+
+<view wx:if="{{showTableDetailModal}}" class="modal-overlay" bindtap="closeTableDetailModal">
+  <view class="modal-content modal-lg" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">桌 {{selectedDetailTable ? selectedDetailTable.number : ''}}</text>
+      <text class="modal-close" bindtap="closeTableDetailModal">×</text>
+    </view>
+    <view class="modal-body">
+      <view wx:if="{{selectedDetailTable && selectedDetailTable.name}}" class="table-name-display">
+        <text>{{selectedDetailTable.name}}</text>
+      </view>
+      <view class="table-info-card">
+        <view class="info-item">
+          <text class="info-item-label">人数上限</text>
+          <text class="info-item-value">{{selectedDetailTable ? selectedDetailTable.maxGuests : 0}}人</text>
+        </view>
+        <view class="info-item">
+          <text class="info-item-label">已安排</text>
+          <text class="info-item-value">{{selectedDetailTable && selectedDetailTable.guests ? selectedDetailTable.guests.length : 0}}人</text>
+        </view>
+      </view>
+      <view class="guest-list-detail">
+        <view wx:if="{{selectedDetailTable && selectedDetailTable.guests && selectedDetailTable.guests.length > 0}}">
+          <view wx:for="{{selectedDetailTable.guests}}" wx:key="id" class="guest-detail-item">
+            <text class="guest-avatar-lg">{{item.name.charAt(0)}}</text>
+            <view class="guest-info-detail">
+              <text class="guest-name-lg">{{item.name}}</text>
+            </view>
+          </view>
+        </view>
+        <view wx:else class="empty-state">
+          <text>该桌暂无宾客</text>
+        </view>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn-secondary" catchtap="closeTableDetailModal">关闭</button>
+      <button class="btn-primary" catchtap="assignGuestsFromDetail">安排宾客</button>
+    </view>
+  </view>
+</view>

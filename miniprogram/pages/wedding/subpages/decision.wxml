@@ -1,0 +1,85 @@
+<view class="decision-container">
+  <scroll-view scroll-x class="category-tabs">
+    <view 
+      wx:for="{{categories}}" 
+      wx:key="id" 
+      class="category-tab {{activeCategory === item.id ? 'active' : ''}}"
+      style="background-color: {{activeCategory === item.id ? item.color : '#F5F5F5'}}"
+      bindtap="switchCategory"
+      data-category="{{item.id}}"
+    >
+      <text class="tab-icon">{{item.icon}}</text>
+      <text class="tab-name">{{item.name}}</text>
+    </view>
+  </scroll-view>
+
+  <view class="action-bar">
+    <view class="add-btn" bindtap="addDecision">+ 添加决策</view>
+    <view wx:if="{{currentDecisions.length >= 2}}" class="compare-btn" bindtap="showCompare">对比选择</view>
+  </view>
+
+  <view wx:if="{{currentDecisions.length === 0}}" class="empty-state">
+    <text class="empty-icon">📝</text>
+    <text class="empty-title">暂无决策记录</text>
+    <text class="empty-desc">点击上方按钮添加你的第一个决策</text>
+  </view>
+
+  <view wx:else class="decision-list">
+    <view 
+      wx:for="{{currentDecisions}}" 
+      wx:key="id" 
+      class="decision-card {{item.isSelected ? 'selected' : ''}}"
+    >
+      <view class="card-content">
+        <view wx:if="{{item.images && item.images.length > 0}}" class="card-image-area">
+          <image 
+            src="{{item.images[0]}}" 
+            mode="aspectFill" 
+            class="card-main-image" 
+            bindtap="previewDecisionImage" 
+            data-urls="{{item.images}}" 
+            data-current="{{item.images[0]}}" 
+          />
+          <view wx:if="{{item.images.length > 1}}" class="card-image-badge">
+            <text>{{item.images.length}}</text>
+          </view>
+        </view>
+        <view wx:else class="card-image-placeholder">
+          <text class="placeholder-icon">📷</text>
+        </view>
+        
+        <view class="card-info">
+          <view class="decision-header">
+            <text class="decision-name">{{item.name}}</text>
+            <text wx:if="{{item.isSelected}}" class="selected-badge">已选择</text>
+          </view>
+          
+          <view class="decision-info">
+            <view wx:if="{{item.price}}" class="info-row">
+              <text class="info-icon">💰</text>
+              <text class="info-value">¥{{item.formattedPrice}}</text>
+            </view>
+            <view wx:if="{{item.date}}" class="info-row">
+              <text class="info-icon">📅</text>
+              <text class="info-value">{{item.date}}</text>
+            </view>
+            <view wx:if="{{item.contact}}" class="info-row">
+              <text class="info-icon">📞</text>
+              <text class="info-value">{{item.contact}}</text>
+            </view>
+          </view>
+          
+          <view wx:if="{{item.notes}}" class="decision-notes">
+            <text class="notes-text">{{item.notes}}</text>
+          </view>
+          
+          <view class="decision-actions">
+            <text class="action-text" bindtap="toggleSelected" data-index="{{index}}">{{item.isSelected ? '取消选择' : '设为选择'}}</text>
+            <text class="action-text" bindtap="editDecision" data-index="{{index}}">编辑</text>
+            <text class="action-text delete" bindtap="deleteDecision" data-index="{{index}}">删除</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

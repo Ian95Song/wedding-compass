@@ -1,0 +1,508 @@
+.date-setup {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #D4A574 0%, #E8B4B8 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.setup-bg {
+  background: #FFFFFF;
+  border-radius: 32rpx;
+  padding: 60rpx 48rpx;
+  margin: 32rpx;
+  text-align: center;
+}
+
+.setup-icon {
+  font-size: 120rpx;
+  margin-bottom: 32rpx;
+}
+
+.setup-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 16rpx;
+}
+
+.setup-desc {
+  font-size: 26rpx;
+  color: #999999;
+  margin-bottom: 40rpx;
+}
+
+.date-picker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx;
+  background: #F5F5F5;
+  border-radius: 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.date-icon {
+  font-size: 36rpx;
+}
+
+.date-text {
+  font-size: 28rpx;
+  color: #333333;
+  flex: 1;
+  text-align: center;
+}
+
+.date-arrow {
+  font-size: 32rpx;
+  color: #999999;
+}
+
+.setup-btn {
+  width: 100%;
+  padding: 28rpx;
+  font-size: 30rpx;
+}
+
+.guide-container {
+  padding: 32rpx;
+  padding-bottom: 120rpx;
+}
+
+.current-phase {
+  background: linear-gradient(135deg, #D4A574 0%, #C4956A 100%);
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  text-align: center;
+}
+
+.phase-badge {
+  display: inline-block;
+  padding: 12rpx 32rpx;
+  border-radius: 32rpx;
+  margin-bottom: 16rpx;
+}
+
+.phase-text {
+  font-size: 26rpx;
+  color: #FFFFFF;
+}
+
+.days-left {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.timeline {
+  margin-bottom: 24rpx;
+}
+
+.phase-item {
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  margin-bottom: 16rpx;
+  overflow: hidden;
+}
+
+.phase-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx;
+}
+
+.phase-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.phase-indicator {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  margin-right: 16rpx;
+}
+
+.phase-content {
+  flex: 1;
+}
+
+.phase-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 4rpx;
+}
+
+.phase-task-count {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.phase-arrow {
+  font-size: 32rpx;
+  color: #999999;
+  transition: transform 0.3s;
+}
+
+.phase-arrow.expanded {
+  transform: rotate(90deg);
+}
+
+.phase-tasks {
+  border-top: 1rpx solid #F0F0F0;
+}
+
+.task-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 20rpx 24rpx;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+
+.task-item:last-child {
+  border-bottom: none;
+}
+
+.task-checkbox {
+  width: 40rpx;
+  height: 40rpx;
+  border: 2rpx solid #D4A574;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.task-checkbox.checked {
+  background: #D4A574;
+  border-color: #D4A574;
+}
+
+.task-checkbox.checked text {
+  color: #FFFFFF;
+  font-size: 22rpx;
+}
+
+.task-content {
+  flex: 1;
+}
+
+.task-name {
+  font-size: 28rpx;
+  color: #333333;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.task-name.completed {
+  color: #999999;
+  text-decoration: line-through;
+}
+
+.task-desc {
+  font-size: 24rpx;
+  color: #999999;
+  display: block;
+}
+
+.task-actions {
+  flex-shrink: 0;
+}
+
+.action-btn {
+  font-size: 24rpx;
+  color: #999999;
+  padding: 8rpx 16rpx;
+}
+
+
+
+.phase-timeline {
+  padding: 24rpx;
+}
+
+.timeline-item {
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.timeline-time {
+  font-size: 26rpx;
+  color: #D4A574;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+}
+
+.timeline-title {
+  font-size: 32rpx;
+  color: #333333;
+  font-weight: 600;
+  margin-bottom: 20rpx;
+}
+
+.timeline-section {
+  margin-bottom: 20rpx;
+}
+
+.timeline-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-name {
+  font-size: 26rpx;
+  color: #E8B4B8;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+  padding-left: 16rpx;
+  border-left: 4rpx solid #E8B4B8;
+}
+
+.timeline-content-item {
+  font-size: 26rpx;
+  color: #666666;
+  line-height: 1.6;
+  padding: 8rpx 0;
+  padding-left: 16rpx;
+  position: relative;
+}
+
+.timeline-content-item::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #D4A574;
+}
+
+.add-task-area {
+  padding: 24rpx;
+}
+
+.add-task-btn {
+  width: 100%;
+  background: #FFFFFF;
+  border: 2rpx dashed #D4A574;
+  color: #D4A574;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  font-size: 28rpx;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  width: 600rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 32rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+}
+
+.modal-close {
+  font-size: 40rpx;
+  color: #999999;
+  line-height: 1;
+}
+
+.modal-body {
+  padding: 32rpx;
+}
+
+.task-input {
+  width: 100%;
+  padding: 20rpx;
+  border: 1rpx solid #E8E8E8;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  margin-bottom: 20rpx;
+}
+
+.task-desc-input {
+  width: 100%;
+  padding: 20rpx;
+  border: 1rpx solid #E8E8E8;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  min-height: 160rpx;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 24rpx;
+  padding: 24rpx 32rpx;
+  border-top: 1rpx solid #F0F0F0;
+}
+
+.modal-footer button {
+  flex: 1;
+  padding: 24rpx;
+  font-size: 28rpx;
+  border-radius: 12rpx;
+}
+
+.form-label {
+  font-size: 26rpx;
+  color: #666666;
+  margin-bottom: 12rpx;
+}
+
+.mt-20 {
+  margin-top: 32rpx;
+}
+
+.phase-picker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 24rpx;
+  background: #F8F8F8;
+  border: 1rpx solid #E8E8E8;
+  border-radius: 12rpx;
+}
+
+.phase-picker-text {
+  font-size: 28rpx;
+  color: #333333;
+}
+
+.phase-picker-arrow {
+  font-size: 32rpx;
+  color: #999999;
+}
+
+.move-task-info {
+  background: #FDF8F3;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.move-task-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333333;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.move-task-current {
+  display: flex;
+  align-items: center;
+}
+
+.current-label {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.current-phase-name {
+  font-size: 24rpx;
+  font-weight: 500;
+}
+
+.phase-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16rpx;
+  margin-top: 16rpx;
+}
+
+.phase-card {
+  position: relative;
+  padding: 20rpx;
+  border: 2rpx solid;
+  border-radius: 12rpx;
+  background: #FFFFFF;
+  transition: all 0.3s ease;
+}
+
+.phase-card.selected {
+  background: linear-gradient(135deg, #D4A574 0%, #C4956A 100%);
+}
+
+.phase-card.selected .phase-card-name,
+.phase-card.selected .phase-card-count {
+  color: #FFFFFF;
+}
+
+.phase-card.selected .phase-indicator {
+  background: #FFFFFF !important;
+}
+
+.phase-card.source-phase {
+  opacity: 0.7;
+}
+
+.phase-indicator {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  display: inline-block;
+  margin-bottom: 8rpx;
+}
+
+.phase-card-name {
+  font-size: 24rpx;
+  color: #333333;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.phase-card-count {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.phase-card-badge {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  font-size: 18rpx;
+  color: #FFFFFF;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 4rpx 12rpx;
+  border-radius: 20rpx;
+}
+
+.btn-primary.disabled {
+  background: #CCCCCC;
+  color: #FFFFFF;
+  border-color: #CCCCCC;
+}
+
+.add-task-modal .modal-body {
+  max-height: 60vh;
+  overflow-y: auto;
+}

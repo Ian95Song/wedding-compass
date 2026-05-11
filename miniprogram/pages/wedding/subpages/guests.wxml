@@ -1,0 +1,191 @@
+<view class="guests-container">
+  <view class="summary-card">
+    <view class="summary-item">
+      <text class="summary-value">{{totalCount}}</text>
+      <text class="summary-label">总人数</text>
+    </view>
+    <view class="summary-divider"></view>
+    <view class="summary-item">
+      <text class="summary-value text-success">{{confirmedCount}}</text>
+      <text class="summary-label">已确认</text>
+    </view>
+    <view class="summary-divider"></view>
+    <view class="summary-item">
+      <text class="summary-value text-warning">{{totalCount - confirmedCount}}</text>
+      <text class="summary-label">待确认</text>
+    </view>
+  </view>
+
+  <view class="search-bar">
+    <input 
+      class="search-input" 
+      placeholder="搜索宾客" 
+      value="{{searchText}}" 
+      bindinput="onSearchInput"
+    />
+    <text class="search-icon">🔍</text>
+  </view>
+
+  <view class="filter-section">
+    <view class="filter-tabs">
+      <view 
+        class="filter-tab {{filterType === 'all' ? 'active' : ''}}"
+        bindtap="onFilterChange"
+        data-type="all"
+      >全部</view>
+      <view 
+        class="filter-tab groom {{filterType === 'groom' ? 'active' : ''}}"
+        bindtap="onFilterChange"
+        data-type="groom"
+      >
+        <text class="tab-icon">🤵</text>
+        <text class="tab-text">男方</text>
+      </view>
+      <view 
+        class="filter-tab bride {{filterType === 'bride' ? 'active' : ''}}"
+        bindtap="onFilterChange"
+        data-type="bride"
+      >
+        <text class="tab-icon">👰</text>
+        <text class="tab-text">女方</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="action-bar">
+    <button class="add-btn" bindtap="addGuest">+ 添加宾客</button>
+    <button class="import-btn" bindtap="showImportModal">导入/导出</button>
+  </view>
+
+  <view wx:if="{{filteredGuests.length === 0}}" class="empty-state">
+    <text class="empty-icon">👥</text>
+    <text class="empty-title">暂无宾客记录</text>
+    <text class="empty-desc">点击上方按钮添加宾客</text>
+  </view>
+
+  <view wx:else class="guests-list">
+    <view 
+      wx:for="{{filteredGuests}}" 
+      wx:key="id" 
+      class="guest-card"
+    >
+      <view class="guest-avatar" style="background: {{item.gender === 'groom' ? 'linear-gradient(135deg, #6B8EAD 0%, #4A6FA5 100%)' : 'linear-gradient(135deg, #E8B4B8 0%, #D4A574 100%)'}}">
+        <text class="avatar-text">{{item.name.charAt(0)}}</text>
+      </view>
+      <view class="guest-info">
+        <view class="guest-header">
+          <text class="guest-name">{{item.name}}</text>
+          <view class="guest-badges">
+            <view class="relation-badge" style="background: {{item.gender === 'groom' ? '#E8F4F8' : '#FDF8F3'}}; color: {{item.gender === 'groom' ? '#4A6FA5' : '#D4A574'}}">
+              {{item.gender === 'groom' ? '🤵 男方' : '👰 女方'}}
+            </view>
+            <view class="confirmed-badge {{item.isConfirmed ? 'confirmed' : 'unconfirmed'}}">
+              {{item.isConfirmed ? '✓ 已确认' : '○ 待确认'}}
+            </view>
+          </view>
+        </view>
+        <view class="guest-details">
+          <text class="guest-phone">{{item.phone}}</text>
+          <text class="guest-relation">{{item.relation.split('-')[1]}}</text>
+        </view>
+        <view wx:if="{{item.table}}" class="guest-table">
+          <text>桌号：{{item.table}}</text>
+        </view>
+        <view wx:if="{{item.note}}" class="guest-note">
+          <text>备注：{{item.note}}</text>
+        </view>
+      </view>
+      <view class="guest-actions">
+        <text class="action-icon" bindtap="toggleConfirmed" data-id="{{item.id}}">{{item.isConfirmed ? '✓' : '○'}}</text>
+        <text class="action-icon" bindtap="editGuest" data-id="{{item.id}}">✎</text>
+        <text class="action-icon delete" bindtap="deleteGuest" data-id="{{item.id}}">✕</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<view wx:if="{{showAddModal}}" class="modal-overlay" bindtap="closeModal">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">{{editingGuest ? '编辑宾客' : '添加宾客'}}</text>
+      <text class="modal-close" bindtap="closeModal">×</text>
+    </view>
+    <view class="modal-body">
+      <input class="form-input" placeholder="姓名" value="{{formData.name}}" bindinput="onInput" data-field="name" />
+      <input class="form-input" placeholder="手机号" value="{{formData.phone}}" bindinput="onInput" data-field="phone" />
+      <view class="form-section">
+        <text class="form-label">关系</text>
+        <view class="relation-section">
+          <view class="relation-group">
+            <text class="group-title">🤵 男方</text>
+            <view class="relation-grid">
+              <view 
+                wx:for="{{groomRelations}}" 
+                wx:key="*this" 
+                class="relation-item {{formData.relation === item ? 'selected groom' : ''}}"
+                bindtap="selectRelation"
+                data-value="{{item}}"
+              >
+                {{item}}
+              </view>
+            </view>
+          </view>
+          <view class="relation-group">
+            <text class="group-title">👰 女方</text>
+            <view class="relation-grid">
+              <view 
+                wx:for="{{brideRelations}}" 
+                wx:key="*this" 
+                class="relation-item {{formData.relation === item ? 'selected bride' : ''}}"
+                bindtap="selectRelation"
+                data-value="{{item}}"
+              >
+                {{item}}
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+      <input class="form-input" placeholder="桌号（可选）" value="{{formData.table}}" bindinput="onInput" data-field="table" />
+      <textarea class="form-textarea" placeholder="备注（可选）" value="{{formData.note}}" bindinput="onInput" data-field="note" />
+      <view class="form-switch">
+        <text class="switch-label">已确认出席</text>
+        <switch value="{{formData.isConfirmed}}" bindchange="toggleConfirmed" />
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn-secondary" bindtap="closeModal">取消</button>
+      <button class="btn-primary" bindtap="saveGuest">保存</button>
+    </view>
+  </view>
+</view>
+
+<view wx:if="{{showImportModal}}" class="modal-overlay" bindtap="closeImportModal">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">导入/导出</text>
+      <text class="modal-close" bindtap="closeImportModal">×</text>
+    </view>
+    <view class="modal-body">
+      <view class="import-options">
+        <view class="import-option" bindtap="importFromContacts">
+          <text class="option-icon">📱</text>
+          <view class="option-info">
+            <text class="option-title">从通讯录导入</text>
+            <text class="option-desc">批量导入手机通讯录中的联系人</text>
+          </view>
+        </view>
+        <view class="import-option" bindtap="exportGuests">
+          <text class="option-icon">📊</text>
+          <view class="option-info">
+            <text class="option-title">导出宾客名单</text>
+            <text class="option-desc">导出为Excel文件</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn-primary" bindtap="closeImportModal">关闭</button>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,57 @@
+<view class="edit-container">
+  <view class="category-banner" style="background-color: {{categoryInfo.color}}">
+    <text class="category-icon">{{categoryInfo.icon}}</text>
+    <text class="category-name">{{categoryInfo.name}}</text>
+    <text class="category-tip">当前添加{{categoryInfo.name}}类型</text>
+  </view>
+
+  <view class="form-section">
+    <view class="form-label">选项名称 *</view>
+    <input class="form-input" placeholder="{{namePlaceholder}}" value="{{formData.name}}" bindinput="onNameInput" />
+  </view>
+
+  <view class="form-section">
+    <view class="form-label">价格（元）</view>
+    <input class="form-input" type="digit" placeholder="{{pricePlaceholder}}" value="{{formData.price}}" bindinput="onPriceInput" />
+  </view>
+
+  <view class="form-section">
+    <view class="form-label">日期</view>
+    <input class="form-input" placeholder="{{datePlaceholder}}" value="{{formData.date}}" bindinput="onDateInput" />
+  </view>
+
+  <view class="form-section">
+    <view class="form-label">联系人</view>
+    <input class="form-input" placeholder="{{contactPlaceholder}}" value="{{formData.contact}}" bindinput="onContactInput" />
+  </view>
+
+  <view class="form-section">
+    <view class="form-label">备注</view>
+    <textarea class="form-textarea" placeholder="{{notesPlaceholder}}" value="{{formData.notes}}" bindinput="onNotesInput" />
+  </view>
+
+  <view class="form-section">
+    <view class="form-label">参考图片（最多3张）</view>
+    <view class="image-upload-area">
+      <view class="image-list">
+        <view wx:for="{{savedImages}}" wx:key="*this" class="image-item">
+          <image src="{{item}}" mode="aspectFill" class="image-preview" bindtap="previewImage" data-src="{{item}}" />
+          <view class="image-delete" bindtap="deleteSavedImage" data-index="{{index}}">×</view>
+        </view>
+        <view wx:for="{{tempImages}}" wx:key="*this" class="image-item">
+          <image src="{{item}}" mode="aspectFill" class="image-preview" bindtap="previewImage" data-src="{{item}}" />
+          <view class="image-delete" bindtap="deleteTempImage" data-index="{{index}}">×</view>
+        </view>
+        <view wx:if="{{savedImages.length + tempImages.length < 3}}" class="image-add" bindtap="chooseImage">
+          <text class="add-icon">+</text>
+          <text class="add-text">添加图片</text>
+        </view>
+      </view>
+      <view class="image-tip">点击已上传的图片可预览大图</view>
+    </view>
+  </view>
+
+  <view class="form-actions">
+    <button class="btn-primary" bindtap="save">保存</button>
+  </view>
+</view>
