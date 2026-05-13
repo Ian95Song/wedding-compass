@@ -1,4 +1,4 @@
-const initData = require('../../../utils/data-init.js');
+const initData = require('../../utils/data-init.js');
 
 Page({
   data: {
@@ -95,7 +95,7 @@ Page({
   editGuest: function (e) {
     const id = e.currentTarget.dataset.id;
     wx.navigateTo({
-      url: '/pages/wedding/subpages/guest-edit?id=' + id
+      url: '/pages/wedding-sub/guest-edit?id=' + id
     });
   },
 

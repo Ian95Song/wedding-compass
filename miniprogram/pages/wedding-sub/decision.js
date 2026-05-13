@@ -1,4 +1,4 @@
-const { decisionCategories } = require('../../../data/tasks.js');
+const { decisionCategories } = require('../../data/tasks.js');
 
 const sampleDecisions = {
   venue: [
@@ -115,14 +115,14 @@ Page({
 
   addDecision: function () {
     wx.navigateTo({
-      url: '/pages/wedding/subpages/decision-edit?category=' + this.data.activeCategory
+      url: '/pages/wedding-sub/decision-edit?category=' + this.data.activeCategory
     });
   },
 
   editDecision: function (e) {
     const index = e.currentTarget.dataset.index;
     wx.navigateTo({
-      url: '/pages/wedding/subpages/decision-edit?category=' + this.data.activeCategory + '&index=' + index
+      url: '/pages/wedding-sub/decision-edit?category=' + this.data.activeCategory + '&index=' + index
     });
   },
 

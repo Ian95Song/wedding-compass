@@ -296,48 +296,20 @@
   font-size: 28rpx;
 }
 
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
 .modal-content {
   width: 600rpx;
-  background: #FFFFFF;
-  border-radius: 24rpx;
-  overflow: hidden;
 }
 
 .modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   padding: 24rpx 32rpx;
-  border-bottom: 1rpx solid #F0F0F0;
 }
 
 .modal-title {
   font-size: 32rpx;
-  font-weight: 600;
-  color: #333333;
 }
 
 .modal-close {
   font-size: 40rpx;
-  color: #999999;
-  line-height: 1;
-}
-
-.modal-body {
-  padding: 32rpx;
 }
 
 .task-input {

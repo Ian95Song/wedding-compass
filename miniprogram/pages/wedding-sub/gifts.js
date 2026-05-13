@@ -1,4 +1,4 @@
-const initData = require('../../../utils/data-init.js');
+const initData = require('../../utils/data-init.js');
 
 Page({
   data: {

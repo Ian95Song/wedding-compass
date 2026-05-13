@@ -1,4 +1,4 @@
-const { budgetTemplates, budgetCategories } = require('../../../data/tasks.js');
+const { budgetTemplates, budgetCategories } = require('../../data/tasks.js');
 
 Page({
   data: {
@@ -83,7 +83,7 @@ Page({
     const index = this.data.budgetList.findIndex(item => item.id === id);
     if (index !== -1) {
       wx.navigateTo({
-        url: '/pages/wedding/subpages/budget-edit?index=' + index
+        url: '/pages/wedding-sub/budget-edit?index=' + index
       });
     }
   },
@@ -106,7 +106,7 @@ Page({
 
   addBudget: function () {
     wx.navigateTo({
-      url: '/pages/wedding/subpages/budget-edit'
+      url: '/pages/wedding-sub/budget-edit'
     });
   }
 });

@@ -93,37 +93,37 @@ Page({
 
   goToDecision: function () {
     wx.navigateTo({
-      url: '/pages/wedding/subpages/decision'
+      url: '/pages/wedding-sub/decision'
     })
   },
 
   goToBudget: function () {
     wx.navigateTo({
-      url: '/pages/wedding/subpages/budget'
+      url: '/pages/wedding-sub/budget'
     })
   },
 
   goToGuests: function () {
     wx.navigateTo({
-      url: '/pages/wedding/subpages/guests'
+      url: '/pages/wedding-sub/guests'
     })
   },
 
   goToSeating: function () {
     wx.navigateTo({
-      url: '/pages/wedding/subpages/seating'
+      url: '/pages/wedding-sub/seating'
     })
   },
 
   goToGifts: function () {
     wx.navigateTo({
-      url: '/pages/wedding/subpages/gifts'
+      url: '/pages/wedding-sub/gifts'
     })
   },
 
   goToChecklist: function () {
     wx.navigateTo({
-      url: '/pages/wedding/subpages/checklist'
+      url: '/pages/wedding-sub/checklist'
     })
   },
 
@@ -160,7 +160,13 @@ Page({
       return
     }
 
-    const gifts = wx.getStorageSync('gifts') || []
+    let gifts
+    try {
+      gifts = wx.getStorageSync('gifts') || []
+    } catch (e) {
+      console.error('load gifts error:', e)
+      gifts = []
+    }
     const newGift = {
       id: 'gift-' + Date.now(),
       name,
@@ -170,7 +176,13 @@ Page({
       date: new Date().toISOString().split('T')[0]
     }
     gifts.push(newGift)
-    wx.setStorageSync('gifts', gifts)
+    try {
+      wx.setStorageSync('gifts', gifts)
+    } catch (e) {
+      console.error('save gifts error:', e)
+      wx.showToast({ title: '保存失败，请重试', icon: 'none' })
+      return
+    }
 
     this.setData({ showGiftModal: false })
     this.loadData()
@@ -225,7 +237,13 @@ Page({
       }
     }
 
-    const decisions = wx.getStorageSync('decisions') || {}
+    let decisions
+    try {
+      decisions = wx.getStorageSync('decisions') || {}
+    } catch (e) {
+      console.error('load decisions error:', e)
+      decisions = {}
+    }
     if (!decisions[category]) {
       decisions[category] = []
     }
@@ -241,7 +259,14 @@ Page({
       isSelected: false,
       formattedPrice: price ? Number(price).toLocaleString() : ''
     })
-    wx.setStorageSync('decisions', decisions)
+    try {
+      wx.setStorageSync('decisions', decisions)
+    } catch (e) {
+      console.error('save decisions error:', e)
+      wx.hideLoading()
+      wx.showToast({ title: '保存失败，请重试', icon: 'none' })
+      return
+    }
 
     wx.hideLoading()
     this.setData({ showDecisionModal: false, tempDecisionImages: [] })
@@ -314,7 +339,13 @@ Page({
     }
 
     const side = relation.startsWith('男方') ? 'groom' : 'bride'
-    const guests = wx.getStorageSync('guests') || []
+    let guests
+    try {
+      guests = wx.getStorageSync('guests') || []
+    } catch (e) {
+      console.error('load guests error:', e)
+      guests = []
+    }
     const newGuest = {
       id: 'guest-' + Date.now(),
       name,
@@ -327,7 +358,13 @@ Page({
       date: new Date().toISOString().split('T')[0]
     }
     guests.push(newGuest)
-    wx.setStorageSync('guests', guests)
+    try {
+      wx.setStorageSync('guests', guests)
+    } catch (e) {
+      console.error('save guests error:', e)
+      wx.showToast({ title: '保存失败，请重试', icon: 'none' })
+      return
+    }
 
     this.setData({ showGuestModal: false })
     this.loadData()
@@ -372,7 +409,13 @@ Page({
       return
     }
 
-    const budgetList = wx.getStorageSync('budgetList') || []
+    let budgetList
+    try {
+      budgetList = wx.getStorageSync('budgetList') || []
+    } catch (e) {
+      console.error('load budgetList error:', e)
+      budgetList = []
+    }
     const newBudget = {
       id: 'budget-' + Date.now(),
       category,
@@ -383,7 +426,13 @@ Page({
       date: new Date().toISOString().split('T')[0]
     }
     budgetList.push(newBudget)
-    wx.setStorageSync('budgetList', budgetList)
+    try {
+      wx.setStorageSync('budgetList', budgetList)
+    } catch (e) {
+      console.error('save budgetList error:', e)
+      wx.showToast({ title: '保存失败，请重试', icon: 'none' })
+      return
+    }
 
     this.setData({ showBudgetModal: false })
     this.loadData()

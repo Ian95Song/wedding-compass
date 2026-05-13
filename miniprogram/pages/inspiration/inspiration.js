@@ -355,7 +355,7 @@ Page({
   viewCase: function (e) {
     const id = e.currentTarget.dataset.id
     wx.navigateTo({
-      url: `/pages/inspiration/case-detail?id=${id}`
+      url: `/pages/inspiration-sub/case-detail?id=${id}`
     })
   },
 

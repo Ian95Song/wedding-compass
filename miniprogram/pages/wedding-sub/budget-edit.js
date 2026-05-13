@@ -1,4 +1,4 @@
-const { budgetCategories } = require('../../../data/tasks.js');
+const { budgetCategories } = require('../../data/tasks.js');
 
 Page({
   data: {

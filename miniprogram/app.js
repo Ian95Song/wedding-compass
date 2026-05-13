@@ -1,15 +1,16 @@
 App({
   onLaunch: function () {
-    console.log('=== App onLaunch ===')
-    const agreed = wx.getStorageSync('privacyAgreed')
-    console.log('privacyAgreed:', agreed)
+    let agreed = false
+    try {
+      agreed = wx.getStorageSync('privacyAgreed')
+    } catch (e) {
+      console.error('load privacyAgreed error:', e)
+    }
     if (agreed) {
-      console.log('已同意，直接加载数据')
       this.globalData.privacyAgreed = true
       this.loadUserData()
       this.loadTasksData()
     } else {
-      console.log('未同意，等待首页显示弹窗')
       this.globalData.privacyAgreed = false
     }
   },
@@ -40,7 +41,11 @@ App({
       confirmText: '我已阅读并同意',
       success: function (res) {
         if (res.confirm) {
-          wx.setStorageSync('privacyAgreed', true)
+          try {
+            wx.setStorageSync('privacyAgreed', true)
+          } catch (e) {
+            console.error('save privacyAgreed error:', e)
+          }
           that.globalData.privacyAgreed = true
           that.loadUserData()
           that.loadTasksData()
@@ -59,17 +64,26 @@ App({
   },
 
   loadUserData: function () {
-    const weddingDate = wx.getStorageSync('weddingDate')
-    const userInfo = wx.getStorageSync('userInfo') || {}
-
-    this.globalData.weddingDate = weddingDate
-    this.globalData.userInfo = userInfo
+    try {
+      const weddingDate = wx.getStorageSync('weddingDate')
+      const userInfo = wx.getStorageSync('userInfo') || {}
+      this.globalData.weddingDate = weddingDate
+      this.globalData.userInfo = userInfo
+    } catch (e) {
+      console.error('loadUserData error:', e)
+    }
   },
 
   loadTasksData: function () {
-    const savedTasks = wx.getStorageSync('tasks')
+    let savedTasks
+    try {
+      savedTasks = wx.getStorageSync('tasks')
+    } catch (e) {
+      console.error('loadTasksData storage read error:', e)
+      savedTasks = null
+    }
     const taskTemplates = require('./data/tasks.js').taskTemplates
-    
+
     if (savedTasks && savedTasks.length > 0) {
       const validatedTasks = savedTasks.map(task => {
         if (!task.phase) {
@@ -84,18 +98,18 @@ App({
         return task
       })
       const deduplicatedTasks = this.deduplicateTasks(validatedTasks)
-      
+
       const templateIds = new Set()
       taskTemplates.forEach(phase => {
         if (!phase.isTimeline && phase.tasks) {
           phase.tasks.forEach(task => templateIds.add(task.id))
         }
       })
-      
-      const hasAllTasks = Array.from(templateIds).every(id => 
+
+      const hasAllTasks = Array.from(templateIds).every(id =>
         deduplicatedTasks.some(t => t.id === id)
       )
-      
+
       if (hasAllTasks) {
         this.globalData.tasks = deduplicatedTasks
       } else {
@@ -122,7 +136,11 @@ App({
       }
     })
     this.globalData.tasks = allTasks
-    wx.setStorageSync('tasks', allTasks)
+    try {
+      wx.setStorageSync('tasks', allTasks)
+    } catch (e) {
+      console.error('reinitializeTasks storage write error:', e)
+    }
   },
 
   deduplicateTasks: function (tasks) {
@@ -139,12 +157,20 @@ App({
 
   saveTasksData: function (tasks) {
     this.globalData.tasks = tasks
-    wx.setStorageSync('tasks', tasks)
+    try {
+      wx.setStorageSync('tasks', tasks)
+    } catch (e) {
+      console.error('saveTasksData error:', e)
+    }
   },
 
   setWeddingDate: function (date) {
     this.globalData.weddingDate = date
-    wx.setStorageSync('weddingDate', date)
+    try {
+      wx.setStorageSync('weddingDate', date)
+    } catch (e) {
+      console.error('setWeddingDate error:', e)
+    }
   },
 
   getTasks: function () {

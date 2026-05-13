@@ -3,19 +3,31 @@
     "pages/index/index",
     "pages/guide/guide",
     "pages/wedding/wedding",
-    "pages/wedding/subpages/decision",
-    "pages/wedding/subpages/decision-edit",
-    "pages/wedding/subpages/budget",
-    "pages/wedding/subpages/budget-edit",
-    "pages/wedding/subpages/guests",
-    "pages/wedding/subpages/guest-edit",
-    "pages/wedding/subpages/seating",
-    "pages/wedding/subpages/gifts",
-    "pages/wedding/subpages/checklist",
     "pages/inspiration/inspiration",
-    "pages/inspiration/case-detail",
     "pages/profile/profile",
     "pages/profile/privacy"
+  ],
+  "subPackages": [
+    {
+      "root": "pages/wedding-sub",
+      "pages": [
+        "decision",
+        "decision-edit",
+        "budget",
+        "budget-edit",
+        "guests",
+        "guest-edit",
+        "seating",
+        "gifts",
+        "checklist"
+      ]
+    },
+    {
+      "root": "pages/inspiration-sub",
+      "pages": [
+        "case-detail"
+      ]
+    }
   ],
   "window": {
     "backgroundTextStyle": "light",

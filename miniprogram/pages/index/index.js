@@ -47,6 +47,7 @@ Page({
     },
     expenseForm: {
       category: '',
+      description: '',
       amount: '',
       isPaid: false,
       note: ''
@@ -56,16 +57,39 @@ Page({
   },
 
   onLoad: function () {
+    this.migrateExpensesData()
     this.checkPrivacyAgreement()
   },
 
   checkPrivacyAgreement: function () {
-    const agreed = wx.getStorageSync('privacyAgreed')
-    if (!agreed) {
+    try {
+      const agreed = wx.getStorageSync('privacyAgreed')
+      if (!agreed) {
+        this.setData({ showPrivacyModal: true })
+      } else {
+        this.setMinDate()
+        this.loadUserData()
+      }
+    } catch (e) {
+      console.error('checkPrivacyAgreement storage error:', e)
       this.setData({ showPrivacyModal: true })
-    } else {
-      this.setMinDate()
-      this.loadUserData()
+    }
+  },
+
+  migrateExpensesData: function () {
+    try {
+      const oldExpenses = wx.getStorageSync('expenses')
+      if (oldExpenses && Array.isArray(oldExpenses) && oldExpenses.length > 0) {
+        const budgetList = wx.getStorageSync('budgetList') || []
+        const migrated = oldExpenses.map(item => ({
+          ...item,
+          id: item.id.replace('expense-', 'budget-')
+        }))
+        wx.setStorageSync('budgetList', [...budgetList, ...migrated])
+        wx.removeStorageSync('expenses')
+      }
+    } catch (e) {
+      console.error('migrateExpensesData error:', e)
     }
   },
 
@@ -86,7 +110,11 @@ Page({
   },
 
   onAgreePrivacy: function () {
-    wx.setStorageSync('privacyAgreed', true)
+    try {
+      wx.setStorageSync('privacyAgreed', true)
+    } catch (e) {
+      console.error('save privacyAgreed error:', e)
+    }
     app.globalData.privacyAgreed = true
     this.setData({ showPrivacyModal: false })
     this.setMinDate()
@@ -269,7 +297,13 @@ Page({
       }
     }
 
-    const decisions = wx.getStorageSync('decisions') || {}
+    let decisions
+    try {
+      decisions = wx.getStorageSync('decisions') || {}
+    } catch (e) {
+      console.error('load decisions error:', e)
+      decisions = {}
+    }
     if (!decisions[category]) {
       decisions[category] = []
     }
@@ -285,7 +319,14 @@ Page({
       isSelected: false,
       formattedPrice: price ? Number(price).toLocaleString() : ''
     })
-    wx.setStorageSync('decisions', decisions)
+    try {
+      wx.setStorageSync('decisions', decisions)
+    } catch (e) {
+      console.error('save decisions error:', e)
+      wx.hideLoading()
+      wx.showToast({ title: '保存失败，请重试', icon: 'none' })
+      return
+    }
 
     wx.hideLoading()
     this.setData({ showDecisionModal: false, tempDecisionImages: [] })
@@ -361,7 +402,13 @@ Page({
     }
 
     const side = relation.startsWith('男方') ? 'groom' : 'bride'
-    const guests = wx.getStorageSync('guests') || []
+    let guests
+    try {
+      guests = wx.getStorageSync('guests') || []
+    } catch (e) {
+      console.error('load guests error:', e)
+      guests = []
+    }
     const newGuest = {
       id: 'guest-' + Date.now(),
       name,
@@ -375,7 +422,13 @@ Page({
     }
 
     guests.push(newGuest)
-    wx.setStorageSync('guests', guests)
+    try {
+      wx.setStorageSync('guests', guests)
+    } catch (e) {
+      console.error('save guests error:', e)
+      wx.showToast({ title: '保存失败，请重试', icon: 'none' })
+      return
+    }
 
     this.setData({ showGuestModal: false })
     wx.showToast({ title: '保存成功', icon: 'success' })
@@ -430,7 +483,13 @@ Page({
       return
     }
 
-    const inspirations = wx.getStorageSync('inspirations') || []
+    let inspirations
+    try {
+      inspirations = wx.getStorageSync('inspirations') || []
+    } catch (e) {
+      console.error('load inspirations error:', e)
+      inspirations = []
+    }
     const newInspiration = {
       id: 'inspiration-' + Date.now(),
       type,
@@ -440,7 +499,13 @@ Page({
     }
 
     inspirations.unshift(newInspiration)
-    wx.setStorageSync('inspirations', inspirations)
+    try {
+      wx.setStorageSync('inspirations', inspirations)
+    } catch (e) {
+      console.error('save inspirations error:', e)
+      wx.showToast({ title: '保存失败，请重试', icon: 'none' })
+      return
+    }
 
     this.setData({ showInspirationModal: false })
     wx.showToast({ title: '保存成功', icon: 'success' })
@@ -449,7 +514,7 @@ Page({
   openExpenseModal: function () {
     this.setData({
       showExpenseModal: true,
-      expenseForm: { category: '', amount: '', isPaid: false, note: '' }
+      expenseForm: { category: '', description: '', amount: '', isPaid: false, note: '' }
     })
   },
 
@@ -473,7 +538,7 @@ Page({
 
   saveExpense: function () {
     const { category, description, amount, isPaid, note } = this.data.expenseForm
-    
+
     if (!category) {
       wx.showToast({ title: '请选择类目', icon: 'none' })
       return
@@ -483,19 +548,25 @@ Page({
       return
     }
 
-    const expenses = wx.getStorageSync('expenses') || []
-    const newExpense = {
-      id: 'expense-' + Date.now(),
-      category,
-      description: description || '',
-      amount: Number(amount),
-      isPaid,
-      note: note || '',
-      date: new Date().toISOString().split('T')[0]
-    }
+    try {
+      const budgetList = wx.getStorageSync('budgetList') || []
+      const newExpense = {
+        id: 'budget-' + Date.now(),
+        category,
+        description: description || '',
+        amount: Number(amount),
+        isPaid,
+        note: note || '',
+        date: new Date().toISOString().split('T')[0]
+      }
 
-    expenses.push(newExpense)
-    wx.setStorageSync('expenses', expenses)
+      budgetList.push(newExpense)
+      wx.setStorageSync('budgetList', budgetList)
+    } catch (e) {
+      console.error('saveExpense storage error:', e)
+      wx.showToast({ title: '保存失败，请重试', icon: 'none' })
+      return
+    }
 
     this.setData({ showExpenseModal: false })
     wx.showToast({ title: '保存成功', icon: 'success' })
@@ -503,7 +574,7 @@ Page({
 
   goToDecision: function () {
     wx.navigateTo({
-      url: '/pages/wedding/subpages/decision'
+      url: '/pages/wedding-sub/decision'
     })
   },
 

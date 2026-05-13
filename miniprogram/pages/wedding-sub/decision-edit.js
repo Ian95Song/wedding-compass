@@ -1,5 +1,5 @@
-const { decisionCategories } = require('../../../data/tasks.js');
-const fileManager = require('../../../utils/file-manager.js');
+const { decisionCategories } = require('../../data/tasks.js');
+const fileManager = require('../../utils/file-manager.js');
 
 Page({
   data: {

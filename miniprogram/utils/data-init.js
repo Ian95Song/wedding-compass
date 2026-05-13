@@ -1,87 +1,91 @@
-const { decisionCategories } = require('../data/tasks.js');
-const presetData = require('../data/preset-data.js');
+const { decisionCategories } = require('../data/tasks.js')
+const presetData = require('../data/preset-data.js')
+const { safeGet, safeSet } = require('../services/storage')
 
 const initData = {
   decisions: () => {
-    let data = wx.getStorageSync('decisions');
+    let data = safeGet('decisions')
     if (!data || typeof data !== 'object' || !Object.keys(data).length) {
-      data = {};
+      data = {}
       decisionCategories.forEach(cat => {
-        data[cat.id] = presetData.decisions[cat.id] || [];
-      });
-      wx.setStorageSync('decisions', data);
+        data[cat.id] = presetData.decisions[cat.id] || []
+      })
+      safeSet('decisions', data)
     }
-    return data;
+    return data
   },
 
   budgetList: () => {
-    let data = wx.getStorageSync('budgetList');
+    let data = safeGet('budgetList')
     if (!data || !data.length) {
       data = presetData.budgetList.map((item, index) => ({
         ...item,
         id: `budget-${Date.now()}-${index}`
-      }));
-      wx.setStorageSync('budgetList', data);
+      }))
+      safeSet('budgetList', data)
     }
-    return data;
+    return data
   },
 
   guests: () => {
-    let data = wx.getStorageSync('guests');
+    let data = safeGet('guests')
     if (!data || !data.length || data.length < presetData.guests.length) {
       data = presetData.guests.map((guest, index) => ({
         ...guest,
         id: `guest-${Date.now()}-${index}`
-      }));
-      wx.setStorageSync('guests', data);
+      }))
+      safeSet('guests', data)
     }
-    return data;
+    return data
   },
 
   tables: () => {
-    let data = wx.getStorageSync('tables');
+    let data = safeGet('tables')
     if (!data || !data.length) {
-      data = JSON.parse(JSON.stringify(presetData.tables));
-      wx.setStorageSync('tables', data);
+      data = JSON.parse(JSON.stringify(presetData.tables))
+      safeSet('tables', data)
     }
-    return data;
+    return data
   },
 
   gifts: () => {
-    let data = wx.getStorageSync('gifts');
-    const isValid = data && Array.isArray(data) && data.length > 0 && 
-                    data.every(item => item && item.id && item.name && item.amount && item.amount > 0);
+    let data = safeGet('gifts')
+    const isValid = data && Array.isArray(data) && data.length > 0 &&
+                    data.every(item => item && item.id && item.name && item.amount && item.amount > 0)
     if (!isValid) {
-      data = JSON.parse(JSON.stringify(presetData.gifts));
-      wx.setStorageSync('gifts', data);
+      data = JSON.parse(JSON.stringify(presetData.gifts))
+      safeSet('gifts', data)
     }
-    return data;
+    return data
   },
 
   checklist: () => {
-    try {
-      let data = wx.getStorageSync('checklist');
-      if (!data || typeof data !== 'object' || !Object.keys(data).length) {
-        data = JSON.parse(JSON.stringify(presetData.checklist));
-        wx.setStorageSync('checklist', data);
-      }
-      return data;
-    } catch (e) {
-      console.error('checklist init error:', e);
-      const data = JSON.parse(JSON.stringify(presetData.checklist));
-      wx.setStorageSync('checklist', data);
-      return data;
+    let data = safeGet('checklist')
+    if (!data || typeof data !== 'object' || !Object.keys(data).length) {
+      data = JSON.parse(JSON.stringify(presetData.checklist))
+      safeSet('checklist', data)
     }
+    return data
+  },
+
+  inspirations: () => {
+    let data = safeGet('inspirations')
+    if (!data || !Array.isArray(data)) {
+      data = []
+      safeSet('inspirations', data)
+    }
+    return data
   },
 
   initAll: () => {
-    initData.decisions();
-    initData.budgetList();
-    initData.guests();
-    initData.tables();
-    initData.gifts();
-    initData.checklist();
+    initData.decisions()
+    initData.budgetList()
+    initData.guests()
+    initData.tables()
+    initData.gifts()
+    initData.checklist()
+    initData.inspirations()
   }
-};
+}
 
-module.exports = initData;
+module.exports = initData
