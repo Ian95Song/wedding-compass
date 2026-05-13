@@ -9,7 +9,7 @@ Wedding Prep Notebook
 | **产品类型：** | 微信小程序 |
 | **文档版本：** | V1.0 |
 | **创建日期：** | 2026年5月9日 |
-| **最后更新：** | 2026年5月10日 |
+| **最后更新：** | 2026年5月13日 |
 | **目标用户：** | 准备婚礼的新人（尤其是第一次办婚礼、缺乏经验的新人） |
 
 ## 1. 产品概述
@@ -331,6 +331,7 @@ Wedding Prep Notebook
 **V1.0版本采用纯本地存储，数据保存在用户手机本地。**
 
 - 使用微信小程序的 `wx.setStorageSync` / `wx.getStorageSync`
+- 通过 `services/storage.js` 统一封装，所有操作包含异常捕获
 - 换机需要手动备份和恢复数据
 - 不依赖网络，离线可用
 
@@ -348,6 +349,7 @@ Wedding Prep Notebook
 | checklist | Object | 婚品清单（按分类存储） |
 | inspirations | Array | 灵感收藏 |
 | userInfo | Object | 用户信息 |
+| privacyAgreed | Boolean | 隐私协议同意状态 |
 
 ### 4.3 数据初始化策略
 
@@ -377,34 +379,133 @@ Wedding Prep Notebook
 | **技术** | **选择** | **理由** |
 |---|---|---|
 | 框架 | 微信小程序原生开发 | 文档完善、性能最佳、无需额外学习框架 |
-| UI组件库 | Vant Weapp（可选） | 轻量、美观、微信生态适配好 |
-| 数据存储 | 本地存储 | 简单、无服务器成本、数据隐私 |
+| UI组件库 | 自定义组件 + CSS变量设计系统 | 轻量化，无第三方依赖，主题统一 |
+| 数据存储 | 本地存储 + 服务层封装 | 简单、无服务器成本、数据隐私 |
 | 开发工具 | 微信开发者工具 | 官方工具保证兼容性 |
+| 样式方案 | CSS Custom Properties | 设计Token统一管理，主题可切换 |
+| 模块化 | 分包加载 + 数据服务层 | 优化首屏性能，数据访问标准化 |
+
+### 5.3 架构设计（V1.1优化）
+
+#### 5.3.1 数据服务层（Services）
+
+为解决各页面直接操作 `wx.setStorageSync` 导致的存储键不一致和异常处理缺失问题，引入数据服务层：
+
+```
+services/
+├── storage.js          # 安全存储封装（safeGet/safeSet/generateId）
+├── budget-service.js   # 预算CRUD + 统计查询
+├── guest-service.js    # 宾客CRUD + 按关系/桌位查询
+├── decision-service.js # 决策CRUD + 按分类查询
+├── gift-service.js     # 礼金CRUD + 金额统计
+├── table-service.js    # 座位CRUD + 宾客分配
+├── checklist-service.js# 婚品CRUD + 进度统计
+├── inspiration-service.js # 灵感CRUD + 标签筛选
+└── task-service.js     # 任务状态管理 + 日期计算
+```
+
+**设计原则：**
+- 每个服务模块独立管理一个存储键的全部CRUD操作
+- 所有存储操作通过 `storage.js` 统一捕获异常
+- 服务层对上层页面透明，页面只需调用服务方法
+- 提供领域查询方法（如 `getByCategory`、`getBySide`），避免页面重复编写过滤逻辑
+
+#### 5.3.2 可复用组件
+
+| **组件** | **说明** |
+|---|---|
+| `wedding-modal` | 通用弹窗组件，支持标题、关闭按钮、底部操作栏，通过slot注入内容 |
+| `empty-state` | 空状态展示组件，支持自定义图标、标题、描述 |
+
+#### 5.3.3 CSS设计系统
+
+在 `app.wxss` 中定义全局CSS变量和共享样式类：
+
+**设计Token（CSS Variables）：**
+- 颜色：`--color-primary`、`--color-secondary`、`--color-bg-*`、`--color-text-*`
+- 渐变：`--gradient-primary`、`--gradient-primary-pink`
+- 阴影：`--shadow-card`
+- 圆角：`--radius-card`、`--radius-pill`、`--radius-input`
+
+**共享样式类：**
+- 布局：`.page-container`、`.card`、`.action-bar`、`.search-bar`
+- 按钮：`.btn-primary`、`.btn-secondary`、`.add-btn`
+- 表单：`.form-item`、`.form-label`、`.form-input`、`.form-textarea`
+- 弹窗：`.modal-mask`、`.modal-container`、`.modal-header`、`.modal-body`、`.modal-footer`
+- 图片上传：`.image-upload`、`.upload-btn`、`.image-item`
+- 空状态：`.empty-state`、`.empty-icon`、`.empty-title`
+- 工具类：`.text-primary`、`.flex`、`.mt-1`、`.font-bold` 等
+
+#### 5.3.4 事件总线
+
+通过 `utils/event-bus.js` 实现跨页面数据同步：
+- `on(event, callback)`：订阅事件
+- `off(event, callback)`：取消订阅
+- `emit(event, data)`：触发事件
+
+适用于首页与子页面之间的数据变更通知（如添加宾客后刷新列表）。
+
+#### 5.3.5 分包加载
+
+为优化首屏加载速度，将非Tab页面拆分为子包：
+
+| **分包** | **包含页面** | **说明** |
+|---|---|---|
+| 主包 | 首页、备婚指南、我的婚礼、灵感库、我的 | Tab页面，启动时加载 |
+| `pages/wedding-sub` | 决策本、预算、宾客、座位、礼金、婚品（含编辑页） | 从"我的婚礼"进入时按需加载 |
+| `pages/inspiration-sub` | 案例详情 | 从灵感库进入时按需加载 |
+
+#### 5.3.6 异常处理策略
+
+所有存储操作统一使用 `try-catch` 包裹：
+- 读取操作失败时返回默认值（空数组/空对象）
+- 写入操作失败时通过 `wx.showToast` 提示用户
+- 迁移操作失败时记录日志但不影响正常使用
 
 ### 5.2 项目目录结构
 
 ```
-wedding-notebook/
+wedding-compass/
 ├── miniprogram/
 │   ├── pages/
-│   │   ├── index/           # 首页
-│   │   ├── guide/           # 备婚指南
-│   │   ├── wedding/         # 我的婚礼
-│   │   │   └── subpages/    # 子页面
-│   │   │       ├── decision.js     # 决策本
-│   │   │       ├── budget.js       # 预算管理
-│   │   │       ├── gifts.js        # 礼金记录
-│   │   │       ├── guests.js       # 宾客名单
-│   │   │       ├── seating.js      # 座位安排
-│   │   │       ├── checklist.js    # 婚品清单
-│   │   │       └── ...             # 编辑页面
-│   │   ├── inspiration/    # 灵感库
-│   │   └── profile/        # 我的
-│   ├── utils/               # 工具函数
-│   ├── data/                # 模板数据
-│   ├── assets/              # 静态资源
+│   │   ├── index/              # 首页（Tab）
+│   │   ├── guide/              # 备婚指南（Tab）
+│   │   ├── wedding/            # 我的婚礼（Tab）
+│   │   ├── wedding-sub/        # 婚礼子页面（分包）
+│   │   │   ├── decision.js     # 决策本
+│   │   │   ├── decision-edit.js
+│   │   │   ├── budget.js       # 预算管理
+│   │   │   ├── budget-edit.js
+│   │   │   ├── guests.js       # 宾客名单
+│   │   │   ├── guest-edit.js
+│   │   │   ├── seating.js      # 座位安排
+│   │   │   ├── gifts.js        # 礼金记录
+│   │   │   └── checklist.js    # 婚品清单
+│   │   ├── inspiration/        # 灵感库（Tab）
+│   │   ├── inspiration-sub/    # 灵感子页面（分包）
+│   │   │   └── case-detail.js  # 案例详情
+│   │   └── profile/            # 我的（Tab）
+│   ├── components/             # 可复用组件
+│   │   ├── wedding-modal/      # 通用弹窗组件
+│   │   └── empty-state/        # 空状态组件
+│   ├── services/               # 数据服务层
+│   │   ├── storage.js          # 安全存储封装
+│   │   ├── budget-service.js   # 预算数据服务
+│   │   ├── guest-service.js    # 宾客数据服务
+│   │   ├── decision-service.js # 决策数据服务
+│   │   ├── gift-service.js     # 礼金数据服务
+│   │   ├── table-service.js    # 座位数据服务
+│   │   ├── checklist-service.js# 婚品清单服务
+│   │   ├── inspiration-service.js # 灵感数据服务
+│   │   └── task-service.js     # 任务数据服务
+│   ├── utils/
+│   │   ├── data-init.js        # 数据初始化
+│   │   ├── event-bus.js        # 事件总线
+│   │   └── index.js            # 工具函数
+│   ├── data/                   # 模板数据
+│   ├── assets/                 # 静态资源
 │   └── app.js / app.json / app.wxss
-├── docs/                    # 文档目录
+├── docs/                       # 文档目录
 └── project.config.json
 ```
 
@@ -560,7 +661,20 @@ wedding-notebook/
 - 本地存储（wx.setStorageSync）
 - 无云端依赖
 
-### 10.2 V1.1 迭代计划
+### 10.2 V1.1 架构优化版（已完成）
+
+**发布时间：** 2026年5月13日
+
+**技术优化：**
+- 修复存储key不一致bug（P0）
+- 全局异常处理机制（P0）
+- CSS设计系统与共享样式（P1）
+- 数据服务层封装（P1）
+- 可复用组件抽取（P1）
+- 事件总线（P2）
+- 分包加载优化（P2）
+
+### 10.3 V1.2 功能迭代计划
 
 **预计时间：** 发布后2周
 
@@ -570,7 +684,7 @@ wedding-notebook/
 - 数据导出功能
 - 二维码查座功能
 
-### 10.3 V2.0 云端版
+### 10.4 V2.0 云端版
 
 **预计时间：** 发布后1个月
 
@@ -612,6 +726,13 @@ wedding-notebook/
 | 2026-05-10 | V1.2版 | **实现宾客与座位双向关联**：分配/移除宾客时自动更新宾客名单中的桌号字段 |
 | 2026-05-10 | V1.2版 | **优化数据初始化**：任意页面首次打开时自动初始化预设数据，无需先打开宾客名单 |
 | 2026-05-10 | V1.2版 | **新增座位安排导出功能**：支持导出Excel格式的座位安排表 |
+| 2026-05-13 | V1.1架构优化 | **P0: 修复存储key不一致bug**：首页保存预算使用`expenses`key与婚礼页`budgetList`不一致，统一为`budgetList`并添加数据迁移 |
+| 2026-05-13 | V1.1架构优化 | **P0: 全局异常处理**：所有存储操作添加try-catch，读取失败返回默认值，写入失败提示用户 |
+| 2026-05-13 | V1.1架构优化 | **P1: CSS设计系统**：定义20+CSS变量（颜色/渐变/阴影/圆角），抽取共享样式类，清理500+行重复CSS |
+| 2026-05-13 | V1.1架构优化 | **P1: 数据服务层**：创建10个服务模块（services/），统一封装CRUD操作和领域查询 |
+| 2026-05-13 | V1.1架构优化 | **P1: 可复用组件**：抽取wedding-modal弹窗组件和empty-state空状态组件 |
+| 2026-05-13 | V1.1架构优化 | **P2: 事件总线**：新增utils/event-bus.js，支持跨页面数据同步 |
+| 2026-05-13 | V1.1架构优化 | **P2: 分包加载**：将婚礼子页面(9页)和案例详情(1页)拆分为子包，优化首屏加载速度 |
 
 ### B. 术语表
 
