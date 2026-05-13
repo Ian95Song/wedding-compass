@@ -4,6 +4,7 @@ const { decisionCategories, budgetCategories, inspirationTags } = require('../..
 
 Page({
   data: {
+    showPrivacyModal: false,
     weddingDate: '',
     weddingDateCN: '',
     daysLeft: 0,
@@ -55,58 +56,44 @@ Page({
   },
 
   onLoad: function () {
-    console.log('=== Index Page onLoad ===')
-    this.setMinDate()
     this.checkPrivacyAgreement()
   },
 
   checkPrivacyAgreement: function () {
-    console.log('=== checkPrivacyAgreement ===')
     const agreed = wx.getStorageSync('privacyAgreed')
-    console.log('privacyAgreed:', agreed, typeof agreed)
     if (!agreed) {
-      console.log('=== 准备显示弹窗 ===')
-      setTimeout(() => {
-        this.showPrivacyModal()
-      }, 500)
+      this.setData({ showPrivacyModal: true })
     } else {
-      console.log('=== 已同意，加载数据 ===')
+      this.setMinDate()
       this.loadUserData()
     }
   },
 
-  showPrivacyModal: function () {
-    console.log('=== showPrivacyModal called ===')
-    const that = this
-    wx.showModal({
-      title: '隐私政策',
-      content: '欢迎使用备婚手账本！\n\n为了保护您的隐私，我们需要您了解以下内容：\n\n1. 您的数据仅存储在您的手机本地\n2. 我们不会收集、存储或传输您的个人信息\n3. 您的数据安全由您自己负责\n\n完整内容请查看：\n• 《用户服务协议》\n• 《隐私政策》\n\n（可在"我的-隐私设置"中查看）',
-      showCancel: true,
-      cancelText: '拒绝',
-      confirmText: '同意',
-      success: function (res) {
-        if (res.confirm) {
-          wx.setStorageSync('privacyAgreed', true)
-          app.globalData.privacyAgreed = true
-          app.loadUserData()
-          app.loadTasksData()
-          that.loadUserData()
-        } else {
-          wx.showModal({
-            title: '提示',
-            content: '您需要同意隐私政策才能使用小程序',
-            showCancel: false,
-            confirmText: '知道了',
-            success: function () {
-              that.showPrivacyModal()
-            }
-          })
-        }
-      },
-      fail: function (err) {
-        console.log('wx.showModal failed:', err)
-      }
+  goToPrivacyPolicy: function (e) {
+    const type = e.currentTarget.dataset.type
+    wx.navigateTo({
+      url: '/pages/profile/privacy?activeTab=' + type
     })
+  },
+
+  onRefusePrivacy: function () {
+    wx.showModal({
+      title: '提示',
+      content: '您需要同意隐私政策才能使用备婚手账本。请在充分阅读并理解协议内容后，再做出决定。',
+      showCancel: false,
+      confirmText: '我知道了'
+    })
+  },
+
+  onAgreePrivacy: function () {
+    wx.setStorageSync('privacyAgreed', true)
+    app.globalData.privacyAgreed = true
+    this.setData({ showPrivacyModal: false })
+    this.setMinDate()
+    app.loadUserData()
+    app.loadTasksData()
+    this.loadUserData()
+    wx.showToast({ title: '已同意协议', icon: 'success' })
   },
 
   onShow: function () {

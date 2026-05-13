@@ -85,14 +85,5 @@ Page({
       showCancel: false,
       confirmText: '知道了'
     })
-  },
-
-  showFeedback: function () {
-    wx.showModal({
-      title: '问题反馈',
-      content: '感谢您的反馈！如有问题或建议，请发送邮件至 feedback@weddingnotebook.com',
-      showCancel: false,
-      confirmText: '知道了'
-    })
   }
 })

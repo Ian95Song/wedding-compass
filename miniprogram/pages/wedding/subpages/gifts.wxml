@@ -4,9 +4,6 @@
       <text class="summary-label">礼金总收入</text>
       <text class="summary-value">¥{{formattedTotal}}</text>
     </view>
-    <view class="summary-action">
-      <button class="export-btn" bindtap="exportGifts">导出记录</button>
-    </view>
   </view>
 
   <view class="search-bar">

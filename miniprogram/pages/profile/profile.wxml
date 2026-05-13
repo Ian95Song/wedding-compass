@@ -30,11 +30,6 @@
         <text class="about-name">使用指南</text>
         <text class="about-arrow">›</text>
       </view>
-      <view class="about-item" bindtap="showFeedback">
-        <view class="about-icon">💬</view>
-        <text class="about-name">问题反馈</text>
-        <text class="about-arrow">›</text>
-      </view>
       <view class="about-item">
         <view class="about-icon">📱</view>
         <text class="about-name">版本号</text>

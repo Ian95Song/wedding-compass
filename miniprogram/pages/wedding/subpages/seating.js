@@ -299,28 +299,24 @@ Page({
       return
     }
     
-    let csv = '桌号,桌名,人数上限,已安排人数,宾客名单\n'
+    let text = '【座位安排表】\n\n'
     
     this.data.tables.forEach(table => {
-      const guests = table.guests ? table.guests.map(g => g.name).join('、') : ''
-      csv += `${table.number},"${table.name || ''}",${table.maxGuests},${table.guests ? table.guests.length : 0},"${guests}"\n`
+      const guests = table.guests && table.guests.length > 0 
+        ? table.guests.map(g => g.name).join('、') 
+        : '（空）'
+      text += `桌号：${table.number} | ${table.name || '主桌'}\n`
+      text += `人数：${table.guests ? table.guests.length : 0}/${table.maxGuests}人\n`
+      text += `宾客：${guests}\n`
+      text += '─────────────────\n'
     })
     
-    const filePath = `${wx.env.USER_DATA_PATH}/seating_export.csv`
-    
-    wx.getFileSystemManager().writeFile({
-      filePath: filePath,
-      data: '\uFEFF' + csv,
-      encoding: 'utf8',
+    wx.setClipboardData({
+      data: text,
       success: () => {
-        wx.showModal({
-          title: '导出成功',
-          content: '座位安排已导出，可使用Excel打开',
-          showCancel: false
-        })
+        wx.showToast({ title: '已复制到剪贴板', icon: 'success' })
       },
-      fail: (err) => {
-        console.error('导出失败:', err)
+      fail: () => {
         wx.showToast({ title: '导出失败', icon: 'none' })
       }
     })

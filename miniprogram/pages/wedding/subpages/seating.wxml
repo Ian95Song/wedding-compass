@@ -22,8 +22,8 @@
       <text class="btn-text">添加桌号</text>
     </button>
     <button class="export-btn" bindtap="exportSeating">
-      <text class="btn-icon">📊</text>
-      <text class="btn-text">导出Excel</text>
+      <text class="btn-icon">📋</text>
+      <text class="btn-text">复制名单</text>
     </button>
   </view>
 

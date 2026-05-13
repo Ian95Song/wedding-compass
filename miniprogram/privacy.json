@@ -1,0 +1,9 @@
+{
+  "privacyKeyMap": {
+    "user_nickname": {
+      "prompt": "用于显示您的昵称",
+      "iconUrl": ""
+    }
+  },
+  "desc": "我们不会收集您的个人信息，您的所有数据仅存储在本地设备。"
+}

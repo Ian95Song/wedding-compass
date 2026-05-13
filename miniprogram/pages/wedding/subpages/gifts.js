@@ -195,9 +195,5 @@ Page({
   onSearchInput: function (e) {
     this.setData({ searchText: e.detail.value })
     this.updateFilteredGifts()
-  },
-
-  exportGifts: function () {
-    wx.showToast({ title: '导出功能开发中', icon: 'none' })
   }
 })

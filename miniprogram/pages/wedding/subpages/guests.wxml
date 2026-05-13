@@ -54,7 +54,7 @@
 
   <view class="action-bar">
     <button class="add-btn" bindtap="addGuest">+ 添加宾客</button>
-    <button class="import-btn" bindtap="showImportModal">导入/导出</button>
+    <button class="import-btn" bindtap="showImportModal">复制名单</button>
   </view>
 
   <view wx:if="{{filteredGuests.length === 0}}" class="empty-state">
@@ -163,23 +163,16 @@
 <view wx:if="{{showImportModal}}" class="modal-overlay" bindtap="closeImportModal">
   <view class="modal-content" catchtap="stopPropagation">
     <view class="modal-header">
-      <text class="modal-title">导入/导出</text>
+      <text class="modal-title">导出</text>
       <text class="modal-close" bindtap="closeImportModal">×</text>
     </view>
     <view class="modal-body">
       <view class="import-options">
-        <view class="import-option" bindtap="importFromContacts">
-          <text class="option-icon">📱</text>
-          <view class="option-info">
-            <text class="option-title">从通讯录导入</text>
-            <text class="option-desc">批量导入手机通讯录中的联系人</text>
-          </view>
-        </view>
         <view class="import-option" bindtap="exportGuests">
-          <text class="option-icon">📊</text>
+          <text class="option-icon">📋</text>
           <view class="option-info">
-            <text class="option-title">导出宾客名单</text>
-            <text class="option-desc">导出为Excel文件</text>
+            <text class="option-title">复制宾客名单</text>
+            <text class="option-desc">复制到剪贴板，可粘贴到Excel</text>
           </view>
         </view>
       </view>

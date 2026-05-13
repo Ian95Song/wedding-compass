@@ -190,19 +190,27 @@ Page({
     wx.showToast({ title: '保存成功', icon: 'success' });
   },
 
-  importFromContacts: function () {
-    wx.showToast({ title: '请手动添加宾客', icon: 'none' });
-    this.setData({ showImportModal: false });
-  },
-
   exportGuests: function () {
-    const guests = this.data.guests;
-    let csv = '姓名,手机号,关系,桌号,备注,确认状态\n';
+    const guests = this.data.guests
+    if (guests.length === 0) {
+      wx.showToast({ title: '暂无宾客数据', icon: 'none' })
+      return
+    }
+    
+    let csv = '姓名,手机号,关系,桌号,备注,确认状态\n'
     guests.forEach(g => {
-      csv += `${g.name},${g.phone},${g.relation},${g.table || '-'},${g.note || '-'},${g.isConfirmed ? '已确认' : '待确认'}\n`;
-    });
-    wx.setStorageSync('guestExport', csv);
-    wx.showToast({ title: '已导出到本地', icon: 'success' });
-    this.setData({ showImportModal: false });
+      csv += `${g.name},${g.phone || '-'},${g.relation || '-'},${g.table || '-'},${g.note || '-'},${g.isConfirmed ? '已确认' : '待确认'}\n`
+    })
+    
+    wx.setClipboardData({
+      data: csv,
+      success: () => {
+        wx.showToast({ title: '已复制到剪贴板', icon: 'success' })
+        this.setData({ showImportModal: false })
+      },
+      fail: () => {
+        wx.showToast({ title: '导出失败', icon: 'none' })
+      }
+    })
   }
-});
+})
